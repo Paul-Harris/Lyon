@@ -5,6 +5,159 @@
  * Interactions : 
  * 
  */
-public class GraphicalUserInterface {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
+public class GraphicalUserInterface {
+	
+	public static JFrame loginFrame = new JFrame("Password Manager");
+	public static JFrame registerFrame = new JFrame("Password Manager");
+
+	public static void main(String[] args) {
+		loginFrame(true);
+	}
+
+	private static void loginFrame(boolean visibility) {
+		
+		loginFrame.setSize(300, 150);
+		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		loginFrame.setVisible(visibility);
+		
+		loginFrame.setLayout(null);
+
+		JLabel userLabel = new JLabel("User Name");
+		userLabel.setBounds(10, 10, 80, 25);
+		loginFrame.add(userLabel);
+
+		JTextField userText = new JTextField(20);
+		userText.setBounds(100, 10, 160, 25);
+		loginFrame.add(userText);
+
+		JLabel passwordLabel = new JLabel("Password");
+		passwordLabel.setBounds(10, 40, 80, 25);
+		loginFrame.add(passwordLabel);
+
+		JPasswordField passwordText = new JPasswordField(20);
+		passwordText.setBounds(100, 40, 160, 25);
+		loginFrame.add(passwordText);
+
+		JButton loginButton = new JButton("Login");
+		loginButton.setBounds(10, 80, 100, 25);
+		loginFrame.add(loginButton);
+
+		JButton registerButton = new JButton("Register");
+		registerButton.setBounds(160, 80, 100, 25);
+		loginFrame.add(registerButton);
+
+
+		loginButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			//DUMMY CODE
+			//THIS IS WHERE THE API DOES IT'S WORK
+			JButton source = (JButton) e.getSource();
+			JOptionPane.showMessageDialog(source, "Login successful. You may now proceed to your destination.");
+			loginFrame.dispose();
+		}
+	});
+		
+		registerButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				registerFrame(true);
+			}
+		});
+	}
+	
+	
+	private static void registerFrame(boolean visibility)
+	{
+		
+		registerFrame.setSize(350, 300);
+		registerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		registerFrame.setVisible(visibility);
+		
+		registerFrame.setLayout(null);
+
+		JLabel firstNameLabel = new JLabel("First Name");
+		firstNameLabel.setBounds(10, 10, 80, 30);
+		registerFrame.add(firstNameLabel);
+
+		JTextField firstNameText = new JTextField(20);
+		firstNameText.setBounds(150, 10, 160, 25);
+		registerFrame.add(firstNameText);
+		
+		JLabel lastNameLabel = new JLabel("Last Name");
+		lastNameLabel.setBounds(10, 40, 80, 25);
+		registerFrame.add(lastNameLabel);
+
+		JTextField lastNameText = new JTextField(20);
+		lastNameText.setBounds(150, 40, 160, 25);
+		registerFrame.add(lastNameText);
+		
+		JLabel userNameLabel = new JLabel("UserName");
+		userNameLabel.setBounds(10, 70, 80, 25);
+		registerFrame.add(userNameLabel);
+
+		JTextField userNameText = new JTextField(20);
+		userNameText.setBounds(150, 70, 160, 25);
+		registerFrame.add(userNameText);
+
+		JLabel passwordLabel = new JLabel("Password");
+		passwordLabel.setBounds(10, 100, 80, 25);
+		registerFrame.add(passwordLabel);
+
+		JPasswordField passwordText = new JPasswordField(20);
+		passwordText.setBounds(150, 100, 160, 25);
+		registerFrame.add(passwordText);
+		
+		JLabel questionLabel = new JLabel("Security Question");
+		questionLabel.setBounds(10, 130, 120, 25);
+		registerFrame.add(questionLabel);
+
+		JTextField questionText = new JTextField(20);
+		questionText.setBounds(150, 130, 160, 25);
+		registerFrame.add(questionText);
+		
+		JLabel answerLabel = new JLabel("Security Answer");
+		answerLabel.setBounds(10, 160, 100, 25);
+		registerFrame.add(answerLabel);
+
+		JTextField answerText = new JTextField(20);
+		answerText.setBounds(150, 160, 160, 25);
+		registerFrame.add(answerText);
+
+		JButton registerButton = new JButton("Register");
+		registerButton.setBounds(50, 200, 100, 25);
+		registerFrame.add(registerButton);
+		
+		registerButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			//DUMMY CODE
+			//THIS IS WHERE THE API DOES IT'S WORK
+			JButton source = (JButton) e.getSource();
+			JOptionPane.showMessageDialog(source, "Registration successful. You can now login.");
+			registerFrame.dispose();
+		}
+	});		
+		
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setBounds(180, 200, 100, 25);
+		registerFrame.add(cancelButton);
+		
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				registerFrame.dispose();
+			}
+		});
+		
+		
+	}
 }
+
