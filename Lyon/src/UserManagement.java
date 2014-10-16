@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class UserManagement
 {
 	private Database db;
-	private verify vy;
+	private verification verify;
 	
 	public UserManagement()
 	{
@@ -20,37 +20,22 @@ public class UserManagement
 	
 	public void command(ArrayList<String> cmd)
 	{
-		String toDo = cmd.get(0);
-		ArrayList<String> nextToDo = cmd.remove(0);
+		String toDo = cmd.remove(0);
 		switch (toDo)
 		{
-		case "add":
-		//what to do when adding user
-			cmd.remove(0);
-			add(cmd);
-		break;
 		case "delete":
-			cmd.remove(0);
+			delete(cmd);
 		//what to do when deleting 
 		break;
 		case  "sign in":
-			cmd.remove(0);
-			
+			signIn(cmd);
 		//Check verification
 		break;
 		case  "sign up":
-			cmd.remove(0);
-			
+			signUp(cmd);
 		//Check verification
 		break;
-		}
-		
-		
-	}
-	
-	public void add(ArrayList<String> cmd)
-	{
-		
+		}	
 	}
 	
 	public void delete(ArrayList<String> cmd)
@@ -67,5 +52,15 @@ public class UserManagement
 	{
 		
 	}
-
+	
+	
+	private class verification()
+	{
+		public verification()
+		{
+			
+		}
+		
+		
+	}
 }
