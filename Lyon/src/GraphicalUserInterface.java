@@ -7,6 +7,8 @@
  */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,12 +20,14 @@ public class GraphicalUserInterface {
 	
 	public static JFrame loginFrame = new JFrame("Password Manager");
 	public static JFrame registerFrame = new JFrame("Password Manager");
+	static UserManagement um;
+	static ArrayList<String> cmd;
 
 	public static void main(String[] args) {
 		loginFrame(true);
 	}
 
-	private static void loginFrame(boolean visibility) {
+	static void loginFrame(boolean visibility) {
 		
 		loginFrame.setSize(300, 150);
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -60,6 +64,15 @@ public class GraphicalUserInterface {
 			public void actionPerformed(ActionEvent e) {
 			//DUMMY CODE
 			//THIS IS WHERE THE API DOES IT'S WORK
+			cmd = new ArrayList<String>();
+			
+			cmd.add("signin");
+			cmd.add(userText.getText());
+			cmd.add(passwordText.getText());
+			
+			//workout usermanagement detials 
+			//um = new UserManagement(cmd);
+					
 			JButton source = (JButton) e.getSource();
 			JOptionPane.showMessageDialog(source, "Login successful. You may now proceed to your destination.");
 			loginFrame.dispose();
