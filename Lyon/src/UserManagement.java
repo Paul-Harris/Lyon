@@ -75,6 +75,8 @@ public class UserManagement
 	
 	public void signUp(ArrayList<String> cmd)
 	{
+		db.addUser(cmd);
+		success = true;
 		
 	}
 	

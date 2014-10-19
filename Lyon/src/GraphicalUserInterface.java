@@ -8,6 +8,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -64,11 +65,8 @@ public class GraphicalUserInterface {
 			public void actionPerformed(ActionEvent e) {
 			//DUMMY CODE
 			//THIS IS WHERE THE API DOES IT'S WORK
-			cmd = new ArrayList<String>();
+			cmd = new ArrayList<String>(Arrays.asList("signin",userText.getText(),passwordText.getText()));
 			
-			cmd.add("signin");
-			cmd.add(userText.getText());
-			cmd.add(passwordText.getText());
 			
 			um = new UserManagement(cmd);
 			
@@ -104,6 +102,7 @@ public class GraphicalUserInterface {
 		
 		registerFrame.setLayout(null);
 
+		//First Name
 		JLabel firstNameLabel = new JLabel("First Name");
 		firstNameLabel.setBounds(10, 10, 80, 30);
 		registerFrame.add(firstNameLabel);
@@ -112,6 +111,7 @@ public class GraphicalUserInterface {
 		firstNameText.setBounds(150, 10, 160, 25);
 		registerFrame.add(firstNameText);
 		
+		//Last Name
 		JLabel lastNameLabel = new JLabel("Last Name");
 		lastNameLabel.setBounds(10, 40, 80, 25);
 		registerFrame.add(lastNameLabel);
@@ -120,6 +120,7 @@ public class GraphicalUserInterface {
 		lastNameText.setBounds(150, 40, 160, 25);
 		registerFrame.add(lastNameText);
 		
+		//Username
 		JLabel userNameLabel = new JLabel("UserName");
 		userNameLabel.setBounds(10, 70, 80, 25);
 		registerFrame.add(userNameLabel);
@@ -127,7 +128,8 @@ public class GraphicalUserInterface {
 		JTextField userNameText = new JTextField(20);
 		userNameText.setBounds(150, 70, 160, 25);
 		registerFrame.add(userNameText);
-
+		
+		//Password
 		JLabel passwordLabel = new JLabel("Password");
 		passwordLabel.setBounds(10, 100, 80, 25);
 		registerFrame.add(passwordLabel);
@@ -136,6 +138,7 @@ public class GraphicalUserInterface {
 		passwordText.setBounds(150, 100, 160, 25);
 		registerFrame.add(passwordText);
 		
+		//Security Question
 		JLabel questionLabel = new JLabel("Security Question");
 		questionLabel.setBounds(10, 130, 120, 25);
 		registerFrame.add(questionLabel);
@@ -144,6 +147,7 @@ public class GraphicalUserInterface {
 		questionText.setBounds(150, 130, 160, 25);
 		registerFrame.add(questionText);
 		
+		//Security Answer
 		JLabel answerLabel = new JLabel("Security Answer");
 		answerLabel.setBounds(10, 160, 100, 25);
 		registerFrame.add(answerLabel);
@@ -152,6 +156,7 @@ public class GraphicalUserInterface {
 		answerText.setBounds(150, 160, 160, 25);
 		registerFrame.add(answerText);
 
+		//register
 		JButton registerButton = new JButton("Register");
 		registerButton.setBounds(50, 200, 100, 25);
 		registerFrame.add(registerButton);
@@ -160,9 +165,20 @@ public class GraphicalUserInterface {
 			public void actionPerformed(ActionEvent e) {
 			//DUMMY CODE
 			//THIS IS WHERE THE API DOES IT'S WORK
+			
+			cmd = new ArrayList<String>(Arrays.asList("signup",firstNameText.getText(),lastNameText.getText(),userNameText.getText(),
+														passwordText.getText(),questionText.getText(),answerText.getText()));	
+			um = new UserManagement(cmd);
+			
 			JButton source = (JButton) e.getSource();
-			JOptionPane.showMessageDialog(source, "Registration successful. You can now login.");
-			registerFrame.dispose();
+			if (um.checkSuccess() ==true)
+			{	
+				
+				JOptionPane.showMessageDialog(source, "Registration successful. You can now login.");
+				registerFrame.dispose();
+			}
+			else
+				JOptionPane.showMessageDialog(source, "Could Not Create Account");
 		}
 	});		
 		
