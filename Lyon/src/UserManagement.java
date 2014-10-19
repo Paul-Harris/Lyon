@@ -21,14 +21,12 @@ public class UserManagement
 	
 	//Receives commands from command line
 	public UserManagement(String[] args) {
-		ArrayList<String> cmd = null;
+		ArrayList<String> cmd = new ArrayList<String>();
 		
 		for (int i = 0; i > args.length; i ++)
 			cmd.add(args[i]);
 		
 		this.command(cmd);
-		
-		
 	}
 	
 	//Receives commands from java api
