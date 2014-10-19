@@ -40,7 +40,7 @@ public class GraphicalUserInterface {
 		userLabel.setBounds(10, 10, 80, 25);
 		loginFrame.add(userLabel);
 
-		JTextField userText = new JTextField(20);
+		final JTextField userText = new JTextField(20);
 		userText.setBounds(100, 10, 160, 25);
 		loginFrame.add(userText);
 
@@ -48,7 +48,7 @@ public class GraphicalUserInterface {
 		passwordLabel.setBounds(10, 40, 80, 25);
 		loginFrame.add(passwordLabel);
 
-		JPasswordField passwordText = new JPasswordField(20);
+		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(100, 40, 160, 25);
 		loginFrame.add(passwordText);
 
@@ -107,7 +107,7 @@ public class GraphicalUserInterface {
 		firstNameLabel.setBounds(10, 10, 80, 30);
 		registerFrame.add(firstNameLabel);
 
-		JTextField firstNameText = new JTextField(20);
+		final JTextField firstNameText = new JTextField(20);
 		firstNameText.setBounds(150, 10, 160, 25);
 		registerFrame.add(firstNameText);
 		
@@ -116,7 +116,7 @@ public class GraphicalUserInterface {
 		lastNameLabel.setBounds(10, 40, 80, 25);
 		registerFrame.add(lastNameLabel);
 
-		JTextField lastNameText = new JTextField(20);
+		final JTextField lastNameText = new JTextField(20);
 		lastNameText.setBounds(150, 40, 160, 25);
 		registerFrame.add(lastNameText);
 		
@@ -125,7 +125,7 @@ public class GraphicalUserInterface {
 		userNameLabel.setBounds(10, 70, 80, 25);
 		registerFrame.add(userNameLabel);
 
-		JTextField userNameText = new JTextField(20);
+		final JTextField userNameText = new JTextField(20);
 		userNameText.setBounds(150, 70, 160, 25);
 		registerFrame.add(userNameText);
 		
@@ -134,7 +134,7 @@ public class GraphicalUserInterface {
 		passwordLabel.setBounds(10, 100, 80, 25);
 		registerFrame.add(passwordLabel);
 
-		JPasswordField passwordText = new JPasswordField(20);
+		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(150, 100, 160, 25);
 		registerFrame.add(passwordText);
 		
@@ -143,7 +143,7 @@ public class GraphicalUserInterface {
 		questionLabel.setBounds(10, 130, 120, 25);
 		registerFrame.add(questionLabel);
 
-		JTextField questionText = new JTextField(20);
+		final JTextField questionText = new JTextField(20);
 		questionText.setBounds(150, 130, 160, 25);
 		registerFrame.add(questionText);
 		
@@ -152,7 +152,7 @@ public class GraphicalUserInterface {
 		answerLabel.setBounds(10, 160, 100, 25);
 		registerFrame.add(answerLabel);
 
-		JTextField answerText = new JTextField(20);
+		final JTextField answerText = new JTextField(20);
 		answerText.setBounds(150, 160, 160, 25);
 		registerFrame.add(answerText);
 
