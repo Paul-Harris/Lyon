@@ -70,12 +70,19 @@ public class GraphicalUserInterface {
 			cmd.add(userText.getText());
 			cmd.add(passwordText.getText());
 			
-			//workout usermanagement detials 
-			//um = new UserManagement(cmd);
-					
+			um = new UserManagement(cmd);
+			
 			JButton source = (JButton) e.getSource();
-			JOptionPane.showMessageDialog(source, "Login successful. You may now proceed to your destination.");
-			loginFrame.dispose();
+			if(um.checkSuccess() == true)
+			{
+				
+				JOptionPane.showMessageDialog(source, "Login successful. You may now proceed to your destination.");
+				loginFrame.dispose();
+			}
+			else
+				JOptionPane.showMessageDialog(source, "Incorrect Username or Password");
+			
+			
 		}
 	});
 		

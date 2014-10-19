@@ -13,8 +13,9 @@ import java.util.ArrayList;
 
 public class UserManagement
 {
-	private Database db;
-	private PasswordSecurity ps;
+	private Database db = new Database();
+	private PasswordSecurity ps = new PasswordSecurity();
+	private boolean success = false;
 		
 	//Receives from other java classes
 	
@@ -63,19 +64,23 @@ public class UserManagement
 		
 	}
 	
-	public boolean signIn(ArrayList<String> cmd)
+	public void signIn(ArrayList<String> cmd)
 	{
-		System.out.println(cmd.toString());
-		//passes userName 0 and password 1 from cmd array
-		//BREAKS HERE! IT GIVES NULL POINTER BUT TO THE AWT WINDOW THAT 
-		//COMES UP TO GIVE A SUCCESS DIALOG AFER ONE LOGS IN 
+		if( ps.verifyPassword(cmd.get(0), cmd.get(1)) == true)
+		{
+			success = true;
+		}
 		
-		return ps.verifyPassword(cmd.get(0),cmd.get(1));
 	}
 	
 	public void signUp(ArrayList<String> cmd)
 	{
 		
+	}
+	
+	public boolean checkSuccess() 
+	{
+		return success;
 	}
 	
 	
@@ -108,13 +113,13 @@ public class UserManagement
 			
 		}
 		public boolean verifyPassword(String userName, String password)
-		{
-			
-			if(db.getPassword(userName) == createHash(password))
+		{	
+			if(db.getPassword(userName).equals(createHash(password))==true)
+			{
 				return true;
+			}
 			else
 				return false;
-			
 		}
 		
 		
