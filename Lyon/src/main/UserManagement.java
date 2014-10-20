@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
+import main.Database.NoSuchUserException;
+
 /**
  * @author The Bomb Squad
  * Created : October 14, 2014
@@ -106,13 +108,18 @@ public class UserManagement
 	public void resetPassword(ArrayList<String> cmd)
 	{
 		//checks to see if the security answer matches what is in the BD
-		if(cmd.get(1).equals(db.getSecurityAnswer(cmd.get(0))) == true)
-		{
-			db.changePassword(cmd.get(0), ps.createHash(cmd.get(2)));
-			
-			//Verifies that the password was succcesfully changed
-			if( db.getPassword(cmd.get(0)).equals(ps.createHash(cmd.get(2))) == true)
-				success = true;
+		try {
+			if(cmd.get(1).equals(db.getSecurityAnswer(cmd.get(0))))
+			{
+				db.changePassword(cmd.get(0), ps.createHash(cmd.get(2)));
+				
+				//Verifies that the password was succcesfully changed
+				if( db.getPassword(cmd.get(0)).equals(ps.createHash(cmd.get(2))))
+					success = true;
+			}
+		} catch (NoSuchUserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 	}
@@ -153,12 +160,18 @@ public class UserManagement
 		}
 		public boolean verifyPassword(String userName, String password)
 		{	
-			if(db.getPassword(userName).equals(createHash(password))==true)
-			{
-				return true;
-			}
-			else
+			try {
+				if(db.getPassword(userName).equals(createHash(password))==true)
+				{
+					return true;
+				}
+				else
+					return false;
+			} catch (NoSuchUserException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 				return false;
+			}
 		}
 		
 		
