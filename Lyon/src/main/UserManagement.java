@@ -76,6 +76,7 @@ public class UserManagement
 		
 	}
 	
+
 	public void signUp(ArrayList<String> cmd)
 	{
 		
@@ -90,10 +91,10 @@ public class UserManagement
 		
 
 		}
-		db.addUser(newUser);
+		//db.addUser(newUser);
 		success = true;
-		
 	}
+
 	
 	public void resetPassword(ArrayList<String> cmd)
 	{
@@ -108,7 +109,7 @@ public class UserManagement
 		}
 		
 	}
-	
+
 	public boolean checkSuccess() 
 	{
 		return success;
@@ -156,3 +157,4 @@ public class UserManagement
 		
 	}
 }
+
