@@ -65,8 +65,7 @@ public class UserManagement
 	
 	public void delete(ArrayList<String> cmd)
 	{
-		
-		
+		db.deleteUser(cmd.get(0));
 	}
 	
 	public void signIn(ArrayList<String> cmd)
@@ -90,11 +89,23 @@ public class UserManagement
 				newUser.add(ps.createHash(cmd.get(i)));
 			else
 				newUser.add(cmd.get(i));
-		
 
 		}
-		//db.addUser(newUser);
-		success = true;
+		User user = new User(cmd.get(0));
+		user.setPasswordHash(cmd.get(1));
+		user.setSecurityQuestion(cmd.get(2));
+		user.setSecurityAnswer(cmd.get(3));
+		
+	
+			if(db.addUser(user))
+			{
+				success = true;
+			}
+			else
+			{
+				success = false;
+			}
+		
 	}
 
 	
