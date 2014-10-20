@@ -33,13 +33,11 @@ public class Database
 		return getUsers(null);
 	}
 
-	public User getUser(String userName) {
+	public User getUser(String userName) throws NoSuchUserException {
 		List<User> users = getUsers(userName);
 
 		if (users.isEmpty()) {
-			System.err
-					.println("No user with username " + userName + " exists.");
-			return null;
+			throw new NoSuchUserException();
 		}
 
 		return users.get(0);
@@ -135,8 +133,7 @@ public class Database
 		// return "Everyone Likes cats dont they";
 	}
 
-	public String getSecurityAnswer(String userName)
-			throws NoSuchUserException {
+	public String getSecurityAnswer(String userName) throws NoSuchUserException {
 		return getUserData(userName, FIELD_SECURITY_ANSWER);
 
 		// return "cats";

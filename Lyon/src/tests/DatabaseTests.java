@@ -49,7 +49,13 @@ public class DatabaseTests
 
 		db.addUser(testUser);
 
-		User userInDB = db.getUser(testUser.getUserName());
+		User userInDB;
+		try {
+			userInDB = db.getUser(testUser.getUserName());
+		} catch (NoSuchUserException e) {
+			fail();
+			return;
+		}
 
 		// userInDB should not be null
 		assertFalse(userInDB == null);
@@ -156,7 +162,12 @@ public class DatabaseTests
 
 		db.changePassword(testUser.getUserName(), testUser.getPasswordHash());
 
-		User userInDB = db.getUser(testUser.getUserName());
+		User userInDB = null;
+		try {
+			userInDB = db.getUser(testUser.getUserName());
+		} catch (NoSuchUserException e) {
+			fail();
+		}
 
 		assertUserFieldsEqual(testUser, userInDB);
 	}
@@ -176,7 +187,12 @@ public class DatabaseTests
 		db.changeSecurityQuestionAndAnswer(testUser.getUserName(),
 				testUser.getSecurityQuestion(), testUser.getSecurityAnswer());
 
-		User userInDB = db.getUser(testUser.getUserName());
+		User userInDB = null;
+		try {
+			userInDB = db.getUser(testUser.getUserName());
+		} catch (NoSuchUserException e) {
+			fail();
+		}
 
 		assertUserFieldsEqual(testUser, userInDB);
 	}
