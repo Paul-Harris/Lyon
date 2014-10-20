@@ -128,6 +128,7 @@ public class Database
 
 	public String getSecurityAnswer(String userName) {
 		return getUserData(userName, FIELD_SECURITY_ANSWER);
+
 		// return "cats";
 	}
 
@@ -152,7 +153,7 @@ public class Database
 	 * @return True if password change successful
 	 */
 	public boolean changePassword(String userName, String newPassword) {
-		return false;
+		return changeUserData(userName, FIELD_PASSWORD, newPassword);
 	}
 
 	/**
@@ -162,7 +163,7 @@ public class Database
 	 * @return True if name change successful
 	 */
 	public boolean changeFullName(String userName, String newFullName) {
-		return false;
+		return changeUserData(userName, FIELD_FULLNAME, newFullName);
 	}
 
 	/**
@@ -174,11 +175,25 @@ public class Database
 	 */
 	public boolean changeSecurityQuestionAndAnswer(String userName,
 			String newSecurityQuestion, String newSecurityAnswer) {
+
+		if (changeUserData(userName, FIELD_SECURITY_QUESTION,
+				newSecurityQuestion)) {
+			return changeUserData(userName, FIELD_SECURITY_ANSWER,
+					newSecurityAnswer);
+		}
+
 		return false;
 	}
 
 	public boolean isConnected() {
 		return dbConnection.isOpen();
+	}
+
+	/**
+	 * Used to close the database connection and free up resources used.
+	 */
+	public void dispose() {
+		dbConnection.dispose();
 	}
 
 	private void initialize(File dbFile) {
@@ -283,6 +298,31 @@ public class Database
 			showError(e, "Error getting " + fieldName + " for user " + userName
 					+ ".\nSQL Used was: " + sql);
 			return null;
+		} finally {
+			disposeIfNotNull(statement);
+		}
+	}
+
+	private boolean changeUserData(String userName, String fieldName,
+			String newValue) {
+		SQLiteStatement statement = null;
+
+		String sql = "UPDATE " + TABLE_USER + " SET " + fieldName
+				+ " = ? WHERE " + FIELD_USERNAME + " = ?;";
+
+		try {
+			statement = dbConnection.prepare(sql);
+
+			statement.bind(1, newValue);
+			statement.bind(2, userName);
+
+			while (statement.step()) {
+			}
+			return true;
+		} catch (SQLiteException e) {
+			showError(e, "Error changing " + fieldName + " to " + newValue
+					+ " for user " + userName + ".\nSQL Used was: " + sql);
+			return false;
 		} finally {
 			disposeIfNotNull(statement);
 		}

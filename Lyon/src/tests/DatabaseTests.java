@@ -119,7 +119,7 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testUserPasswordMatches() {
+	public void testPasswordMatches() {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -131,6 +131,44 @@ public class DatabaseTests
 				testUser.getPasswordHash()));
 		assertFalse(db.passwordMatches(testUser.getUserName(),
 				testUser.getPasswordHash() + "0"));
+	}
+
+	@Test
+	public void testChangePassword() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		testUser.setPasswordHash(randomString());
+
+		db.changePassword(testUser.getUserName(), testUser.getPasswordHash());
+
+		User userInDB = db.getUser(testUser.getUserName());
+
+		assertUserFieldsEqual(testUser, userInDB);
+	}
+
+	@Test
+	public void testChangeSecurityQuestionAndAnswer() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		testUser.setSecurityQuestion(randomString());
+		testUser.setSecurityAnswer(randomString());
+
+		db.changeSecurityQuestionAndAnswer(testUser.getUserName(),
+				testUser.getSecurityQuestion(), testUser.getSecurityAnswer());
+
+		User userInDB = db.getUser(testUser.getUserName());
+
+		assertUserFieldsEqual(testUser, userInDB);
 	}
 
 	private void assertUserFieldsEqual(User userA, User userB) {
