@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import main.Database;
+import main.Database.NoSuchUserException;
 import main.User;
 import main.User.Role;
 
@@ -127,10 +128,19 @@ public class DatabaseTests
 
 		db.addUser(testUser);
 
-		assertTrue(db.passwordMatches(testUser.getUserName(),
-				testUser.getPasswordHash()));
-		assertFalse(db.passwordMatches(testUser.getUserName(),
-				testUser.getPasswordHash() + "0"));
+		try {
+			assertTrue(db.passwordMatches(testUser.getUserName(),
+					testUser.getPasswordHash()));
+		} catch (NoSuchUserException e) {
+			fail();
+		}
+
+		try {
+			assertFalse(db.passwordMatches(testUser.getUserName(),
+					testUser.getPasswordHash() + "0"));
+		} catch (NoSuchUserException e) {
+			fail();
+		}
 	}
 
 	@Test

@@ -16,9 +16,7 @@ import com.almworks.sqlite4java.SQLiteStatement;
  * @author The Bomb Squad
  * @version October 20, 2014
  * @purpose Database is the model of the Lyon password management system that
- *          connects to the SQLite database to push and retrive values. TODO:
- *          Throw an exception when information is queried about a user who
- *          doesn't exist.
+ *          connects to the SQLite database to push and retrive values.
  */
 
 public class Database
@@ -48,7 +46,14 @@ public class Database
 	}
 
 	public boolean userExists(String userName) {
-		return userDataMatches(userName, FIELD_USERNAME, userName);
+		String userNameInDB = null;
+		try {
+			userNameInDB = getUserData(userName, FIELD_USERNAME);
+		} catch (NoSuchUserException e) {
+			return false;
+		}
+
+		return (userNameInDB != null);
 	}
 
 	/**
@@ -105,7 +110,8 @@ public class Database
 		}
 	}
 
-	public boolean securityAnswerMatches(String userName, String securityAnswer) {
+	public boolean securityAnswerMatches(String userName, String securityAnswer)
+			throws NoSuchUserException {
 		return userDataMatches(userName, FIELD_SECURITY_ANSWER, securityAnswer);
 	}
 
@@ -115,18 +121,22 @@ public class Database
 	 * @param password
 	 *            The hashed password
 	 * @return
+	 * @throws NoSuchUserException
 	 */
-	public boolean passwordMatches(String userName, String password) {
+	public boolean passwordMatches(String userName, String password)
+			throws NoSuchUserException {
 		return userDataMatches(userName, FIELD_PASSWORD, password);
 	}
 
-	public String getSecurityQuestion(String userName) {
+	public String getSecurityQuestion(String userName)
+			throws NoSuchUserException {
 		return getUserData(userName, FIELD_SECURITY_QUESTION);
 
 		// return "Everyone Likes cats dont they";
 	}
 
-	public String getSecurityAnswer(String userName) {
+	public String getSecurityAnswer(String userName)
+			throws NoSuchUserException {
 		return getUserData(userName, FIELD_SECURITY_ANSWER);
 
 		// return "cats";
@@ -136,8 +146,9 @@ public class Database
 	 * 
 	 * @param userName
 	 * @return The hashed password
+	 * @throws NoSuchUserException
 	 */
-	public String getPassword(String userName) {
+	public String getPassword(String userName) throws NoSuchUserException {
 		return getUserData(userName, FIELD_PASSWORD);
 
 		// testing only this hash is for "cats"
@@ -194,6 +205,11 @@ public class Database
 	 */
 	public void dispose() {
 		dbConnection.dispose();
+	}
+
+	public class NoSuchUserException extends Exception
+	{
+		private static final long serialVersionUID = 5654784800867083023L;
 	}
 
 	private void initialize(File dbFile) {
@@ -268,18 +284,21 @@ public class Database
 	}
 
 	private boolean userDataMatches(String userName, String fieldName,
-			String expectedValue) {
-		String fieldData = getUserData(userName, fieldName);
-		if (fieldData == null) {
-			System.err
-					.println("Database probably does not contain a user named "
-							+ userName);
-			return false;
+			String expectedValue) throws NoSuchUserException {
+
+		String fieldData;
+
+		try {
+			fieldData = getUserData(userName, fieldName);
+		} catch (NoSuchUserException e) {
+			throw (e);
 		}
+
 		return fieldData.equals(expectedValue);
 	}
 
-	private String getUserData(String userName, String fieldName) {
+	private String getUserData(String userName, String fieldName)
+			throws NoSuchUserException {
 		SQLiteStatement statement = null;
 
 		String sql = "SELECT " + fieldName + " FROM " + TABLE_USER + " WHERE "
@@ -293,7 +312,7 @@ public class Database
 			while (statement.step()) {
 				return statement.columnString(0);
 			}
-			return null;
+			throw new NoSuchUserException();
 		} catch (SQLiteException e) {
 			showError(e, "Error getting " + fieldName + " for user " + userName
 					+ ".\nSQL Used was: " + sql);
