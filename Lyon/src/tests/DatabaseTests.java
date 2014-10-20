@@ -1,6 +1,6 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +17,7 @@ public class DatabaseTests
 	public void testDatabaseConnection() {
 		Database db = new Database();
 
-		assertEquals(db.isConnected(), true);
+		assertTrue(db.isConnected());
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class DatabaseTests
 		// There should be zero users
 		assertEquals(db.getUsers().size(), 0);
 	}
-	
+
 	@Test
 	public void testAddThreeUsersAndDeleteTwo() {
 		// Create an in-memory test database
@@ -82,9 +82,22 @@ public class DatabaseTests
 		// There should be one user
 		List<User> users = db.getUsers();
 		assertEquals(users.size(), 1);
-		
+
 		// The one user left should have testUserB's information
 		assertUserFieldsEqual(users.get(0), testUserB);
+	}
+
+	@Test
+	public void testUserExists() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		assertTrue(db.userExists(testUser.getUserName()));
+		assertFalse(db.userExists(testUser.getUserName() + "0"));
 	}
 
 	private void assertUserFieldsEqual(User userA, User userB) {
@@ -106,7 +119,7 @@ public class DatabaseTests
 
 		return testUser;
 	}
-	
+
 	private String randomString() {
 		return UUID.randomUUID().toString();
 	}

@@ -56,20 +56,6 @@ public class Database
 		initialize(databaseFile);
 	}
 
-	private void initialize(File dbFile) {
-		connect(dbFile);
-		createTableIfNotExisting(TABLE_USER, SCHEMA_USER_TABLE);
-	}
-
-	private void createTableIfNotExisting(String tableName, String schema) {
-		try {
-			dbConnection.exec("CREATE TABLE IF NOT EXISTS " + tableName + " ("
-					+ schema + ")");
-		} catch (SQLiteException e) {
-			showError(e, "Could not create table " + tableName);
-		}
-	}
-
 	/**
 	 * Update this method if CSV_USER_TABLE_FIELDS changes.
 	 * 
@@ -111,17 +97,27 @@ public class Database
 		return users;
 	}
 
-	private void connect(File dbFile) {
-		dbConnection = new SQLiteConnection(dbFile);
-		try {
-			dbConnection.open(true);
-		} catch (SQLiteException e) {
-			showError(e, "Could not connect to database.");
-		}
-	}
-
 	public boolean userExists(String userName) {
-		return false;
+		String sql = "SELECT " + FIELD_USERNAME + " FROM " + TABLE_USER
+				+ " WHERE " + FIELD_USERNAME + " = ?;";
+		SQLiteStatement statement = null;
+		try {
+			statement = dbConnection.prepare(sql);
+
+			statement.bind(1, userName);
+
+			while (statement.step()) {
+				if (statement.columnString(0).equals(userName)) {
+					return true;
+				}
+			}
+			return false;
+		} catch (SQLiteException e) {
+			showError(e, "Error checking whether user " + userName + " exists.");
+			return false;
+		} finally {
+			disposeIfNotNull(statement);
+		}
 	}
 
 	/**
@@ -178,22 +174,6 @@ public class Database
 		}
 	}
 
-	private void showError(Exception e, String message) {
-		System.err.println(message);
-		e.printStackTrace();
-	}
-
-	private void disposeIfNotNull(SQLiteStatement statement) {
-		if (statement != null) {
-			statement.dispose();
-		}
-	}
-
-	private static void exec(SQLiteStatement st) throws SQLiteException {
-		while (st.step()) {
-		}
-	}
-
 	public boolean securityAnswerCorrect(String userName, String securityAnswer) {
 		return false;
 	}
@@ -246,6 +226,45 @@ public class Database
 
 	public SQLiteConnection getConnection() {
 		return dbConnection;
+	}
+
+	private void initialize(File dbFile) {
+		connect(dbFile);
+		createTableIfNotExisting(TABLE_USER, SCHEMA_USER_TABLE);
+	}
+
+	private void connect(File dbFile) {
+		dbConnection = new SQLiteConnection(dbFile);
+		try {
+			dbConnection.open(true);
+		} catch (SQLiteException e) {
+			showError(e, "Could not connect to database.");
+		}
+	}
+
+	private void createTableIfNotExisting(String tableName, String schema) {
+		try {
+			dbConnection.exec("CREATE TABLE IF NOT EXISTS " + tableName + " ("
+					+ schema + ")");
+		} catch (SQLiteException e) {
+			showError(e, "Could not create table " + tableName);
+		}
+	}
+
+	private void showError(Exception e, String message) {
+		System.err.println(message);
+		e.printStackTrace();
+	}
+
+	private void disposeIfNotNull(SQLiteStatement statement) {
+		if (statement != null) {
+			statement.dispose();
+		}
+	}
+
+	private static void exec(SQLiteStatement st) throws SQLiteException {
+		while (st.step()) {
+		}
 	}
 
 }
