@@ -108,35 +108,13 @@ public class Database
 		}
 	}
 
-	public boolean securityAnswerMatches(String userName, String securityAnswer)
-			throws NoSuchUserException {
-		return userDataMatches(userName, FIELD_SECURITY_ANSWER, securityAnswer);
-	}
-
-	/**
-	 * 
-	 * @param userName
-	 * @param password
-	 *            The hashed password
-	 * @return
-	 * @throws NoSuchUserException
-	 */
-	public boolean passwordMatches(String userName, String password)
-			throws NoSuchUserException {
-		return userDataMatches(userName, FIELD_PASSWORD, password);
-	}
-
 	public String getSecurityQuestion(String userName)
 			throws NoSuchUserException {
 		return getUserData(userName, FIELD_SECURITY_QUESTION);
-
-		// return "Everyone Likes cats dont they";
 	}
 
 	public String getSecurityAnswer(String userName) throws NoSuchUserException {
 		return getUserData(userName, FIELD_SECURITY_ANSWER);
-
-		// return "cats";
 	}
 
 	/**
@@ -147,10 +125,14 @@ public class Database
 	 */
 	public String getPassword(String userName) throws NoSuchUserException {
 		return getUserData(userName, FIELD_PASSWORD);
+	}
 
-		// testing only this hash is for "cats"
-		// String password =
-		//return "1c0fb5008c573315e7b1e1af5ab41d0ce9b8d4469e41c4d59c3041bd99671208c415fcb0359418dd6bc481863d3d5d030a75364318afbec54cdba082df3f9577";
+	public String getRole(String userName) throws NoSuchUserException {
+		return getUserData(userName, FIELD_ROLE);
+	}
+
+	public String getFullName(String userName) throws NoSuchUserException {
+		return getUserData(userName, FIELD_FULLNAME);
 	}
 
 	/**
@@ -184,13 +166,23 @@ public class Database
 	public boolean changeSecurityQuestionAndAnswer(String userName,
 			String newSecurityQuestion, String newSecurityAnswer) {
 
-		if (changeUserData(userName, FIELD_SECURITY_QUESTION,
-				newSecurityQuestion)) {
-			return changeUserData(userName, FIELD_SECURITY_ANSWER,
-					newSecurityAnswer);
+		if (changeSecurityQuestion(userName, newSecurityQuestion)) {
+			return changeSecurityAnswer(userName, newSecurityAnswer);
 		}
 
 		return false;
+	}
+
+	private boolean changeSecurityQuestion(String userName,
+			String newSecurityQuestion) {
+		return changeUserData(userName, FIELD_SECURITY_QUESTION,
+				newSecurityQuestion);
+	}
+
+	private boolean changeSecurityAnswer(String userName,
+			String newSecurityAnswer) {
+		return changeUserData(userName, FIELD_SECURITY_ANSWER,
+				newSecurityAnswer);
 	}
 
 	public boolean isConnected() {
@@ -278,20 +270,6 @@ public class Database
 		}
 
 		return users;
-	}
-
-	private boolean userDataMatches(String userName, String fieldName,
-			String expectedValue) throws NoSuchUserException {
-
-		String fieldData;
-
-		try {
-			fieldData = getUserData(userName, fieldName);
-		} catch (NoSuchUserException e) {
-			throw (e);
-		}
-
-		return fieldData.equals(expectedValue);
 	}
 
 	private String getUserData(String userName, String fieldName)
