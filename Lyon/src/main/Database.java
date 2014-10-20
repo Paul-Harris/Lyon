@@ -16,8 +16,7 @@ import com.almworks.sqlite4java.SQLiteStatement;
  * @author The Bomb Squad
  * @version October 19, 2014
  * @purpose Database is the model of the Lyon password management system that
- *          connects to the SQLite database to push and retrive values. Note
- *          that all passwords passed in should be hashed.
+ *          connects to the SQLite database to push and retrive values.
  */
 
 public class Database
@@ -67,8 +66,7 @@ public class Database
 			dbConnection.exec("CREATE TABLE IF NOT EXISTS " + tableName + " ("
 					+ schema + ")");
 		} catch (SQLiteException e) {
-			System.err.println("Could not create table " + tableName);
-			e.printStackTrace();
+			showError(e, "Could not create table " + tableName);
 		}
 	}
 
@@ -107,9 +105,7 @@ public class Database
 
 			statement.dispose();
 		} catch (SQLiteException e) {
-			System.err.println("The following SQL Statement failed:");
-			System.err.println(sql);
-			e.printStackTrace();
+			showError(e, "Failed to get users. SQL used was\n" + sql);
 		}
 
 		return users;
@@ -120,8 +116,7 @@ public class Database
 		try {
 			dbConnection.open(true);
 		} catch (SQLiteException e) {
-			System.err.println("Could not connect to database.");
-			e.printStackTrace();
+			showError(e, "Could not connect to database.");
 		}
 	}
 
@@ -152,29 +147,51 @@ public class Database
 			exec(statement);
 			return true;
 		} catch (SQLiteException e) {
-			System.out.println("Could not add user " + user.getUserName()
+			showError(e, "Could not add user " + user.getUserName()
 					+ " to the database.");
-			e.printStackTrace();
 			return false;
 		} finally {
-			if (statement != null) {
-				statement.dispose();
-			}
+			disposeIfNotNull(statement);
+		}
+	}
+
+	/**
+	 * 
+	 * @return true if user removed successfully
+	 */
+	public boolean deleteUser(String userName) {
+		String sql = "DELETE FROM " + TABLE_USER + " WHERE " + FIELD_USERNAME
+				+ " = ?;";
+		SQLiteStatement statement = null;
+		try {
+			statement = dbConnection.prepare(sql);
+
+			statement.bind(1, userName);
+
+			exec(statement);
+			return true;
+		} catch (SQLiteException e) {
+			showError(e, "Could not remove user " + userName);
+			return false;
+		} finally {
+			disposeIfNotNull(statement);
+		}
+	}
+
+	private void showError(Exception e, String message) {
+		System.err.println(message);
+		e.printStackTrace();
+	}
+
+	private void disposeIfNotNull(SQLiteStatement statement) {
+		if (statement != null) {
+			statement.dispose();
 		}
 	}
 
 	private static void exec(SQLiteStatement st) throws SQLiteException {
 		while (st.step()) {
 		}
-	}
-
-	/**
-	 * 
-	 * @param userName
-	 * @return true if user removed successfully
-	 */
-	public boolean deleteUser(String userName) {
-		return false;
 	}
 
 	public boolean securityAnswerCorrect(String userName, String securityAnswer) {
@@ -204,10 +221,10 @@ public class Database
 	/**
 	 * 
 	 * @param userName
-	 * @param newName
+	 * @param newFullName
 	 * @return true if name change successful
 	 */
-	public boolean changeName(String userName, String newName) {
+	public boolean changeFullName(String userName, String newFullName) {
 		return false;
 	}
 

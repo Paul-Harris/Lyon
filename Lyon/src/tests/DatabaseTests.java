@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+import java.util.UUID;
 
 import main.Database;
 import main.User;
@@ -24,18 +25,10 @@ public class DatabaseTests
 		// Create an in-memory test database
 		Database db = new Database(null);
 
-		// Make a test user
-		User testUser = new User("username1");
-		testUser.setFullName("fullname1");
-		testUser.setPasswordHash("passwordHash1");
-		testUser.setRole(Role.USER);
-		testUser.setSecurityAnswer("securityAnswer1");
-		testUser.setSecurityQuestion("securityQuestion1");
+		User testUser = createTestUserWithRandomInfo();
 
-		// Add the test user
 		db.addUser(testUser);
 
-		// Get the users in the database
 		List<User> users = db.getUsers();
 
 		// There should be only 1 user
@@ -43,13 +36,79 @@ public class DatabaseTests
 		User user1 = users.get(0);
 
 		// Make sure all the fields are equal
-		assertEquals(testUser.getUserName(), user1.getUserName());
-		assertEquals(testUser.getFullName(), user1.getFullName());
-		assertEquals(testUser.getPasswordHash(), user1.getPasswordHash());
-		assertEquals(testUser.getRole(), user1.getRole());
-		assertEquals(testUser.getSecurityAnswer(), user1.getSecurityAnswer());
-		assertEquals(testUser.getSecurityQuestion(),
-				user1.getSecurityQuestion());
+		assertUserFieldsEqual(testUser, user1);
+	}
+
+	@Test
+	public void testAddAndDeleteOneUser() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		// There should be one user
+		assertEquals(db.getUsers().size(), 1);
+
+		db.deleteUser(testUser.getUserName());
+
+		// There should be zero users
+		assertEquals(db.getUsers().size(), 0);
+	}
+	
+	@Test
+	public void testAddThreeUsersAndDeleteTwo() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		// Create three random test users
+		User testUserA = createTestUserWithRandomInfo();
+		User testUserB = createTestUserWithRandomInfo();
+		User testUserC = createTestUserWithRandomInfo();
+
+		// Add the three users
+		db.addUser(testUserB);
+		db.addUser(testUserC);
+		db.addUser(testUserA);
+
+		// There should be three users
+		assertEquals(db.getUsers().size(), 3);
+
+		// Delete two of them
+		db.deleteUser(testUserC.getUserName());
+		db.deleteUser(testUserA.getUserName());
+
+		// There should be one user
+		List<User> users = db.getUsers();
+		assertEquals(users.size(), 1);
+		
+		// The one user left should have testUserB's information
+		assertUserFieldsEqual(users.get(0), testUserB);
+	}
+
+	private void assertUserFieldsEqual(User userA, User userB) {
+		assertEquals(userA.getUserName(), userB.getUserName());
+		assertEquals(userA.getFullName(), userB.getFullName());
+		assertEquals(userA.getPasswordHash(), userB.getPasswordHash());
+		assertEquals(userA.getRole(), userB.getRole());
+		assertEquals(userA.getSecurityAnswer(), userB.getSecurityAnswer());
+		assertEquals(userA.getSecurityQuestion(), userB.getSecurityQuestion());
+	}
+
+	private User createTestUserWithRandomInfo() {
+		User testUser = new User(randomString());
+		testUser.setFullName(randomString());
+		testUser.setPasswordHash(randomString());
+		testUser.setRole(Role.USER);
+		testUser.setSecurityAnswer(randomString());
+		testUser.setSecurityQuestion(randomString());
+
+		return testUser;
+	}
+	
+	private String randomString() {
+		return UUID.randomUUID().toString();
 	}
 
 }
