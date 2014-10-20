@@ -14,44 +14,15 @@ import com.almworks.sqlite4java.SQLiteStatement;
 
 /**
  * @author The Bomb Squad
- * @version October 19, 2014
+ * @version October 20, 2014
  * @purpose Database is the model of the Lyon password management system that
- *          connects to the SQLite database to push and retrive values.
+ *          connects to the SQLite database to push and retrive values. TODO:
+ *          Throw an exception when information is queried about a user who
+ *          doesn't exist.
  */
 
 public class Database
 {
-
-	private SQLiteConnection dbConnection;
-
-	public static final String TABLE_USER = "User";
-	public static final String FIELD_USERNAME = "Username";
-	public static final String FIELD_PASSWORD = "Password";
-	public static final String FIELD_FULLNAME = "FullName";
-	public static final String FIELD_SECURITY_QUESTION = "SecurityQuestion";
-	public static final String FIELD_SECURITY_ANSWER = "SecurityAnswer";
-	public static final String FIELD_ROLE = "Role";
-
-	private static final File DEFAULT_DB_FILE = new File("users.sqlite");
-
-	private static final String FIELD_USER_ID = "UserID";
-	private static final String SCHEMA_USER_TABLE =
-	/*  */FIELD_USER_ID + " INTEGER PRIMARY KEY, " +
-	/*  */FIELD_USERNAME + " TEXT UNIQUE, " +
-	/*  */FIELD_PASSWORD + " TEXT, " +
-	/*  */FIELD_FULLNAME + " TEXT, " +
-	/*  */FIELD_SECURITY_QUESTION + " TEXT, " +
-	/*  */FIELD_SECURITY_ANSWER + " TEXT, " +
-	/*  */FIELD_ROLE + " text";
-
-	/**
-	 * Update this string if user fields change.
-	 */
-	private static final String CSV_USER_TABLE_FIELDS = FIELD_USERNAME + ", "
-			+ FIELD_PASSWORD + ", " + FIELD_FULLNAME + ", "
-			+ FIELD_SECURITY_QUESTION + ", " + FIELD_SECURITY_ANSWER + ", "
-			+ FIELD_ROLE;
-
 	public Database() {
 		initialize(DEFAULT_DB_FILE);
 	}
@@ -60,45 +31,20 @@ public class Database
 		initialize(databaseFile);
 	}
 
-	/**
-	 * Update this method if user fields change.
-	 * 
-	 * @return A list of all users.
-	 */
 	public List<User> getUsers() {
-		List<User> users = new ArrayList<User>();
+		return getUsers(null);
+	}
 
-		String sql = "SELECT " + CSV_USER_TABLE_FIELDS + " FROM " + TABLE_USER
-				+ ";";
+	public User getUser(String userName) {
+		List<User> users = getUsers(userName);
 
-		try {
-			SQLiteStatement statement = dbConnection.prepare(sql);
-
-			while (statement.step()) {
-				Map<String, String> fields = new HashMap<String, String>();
-
-				int columnCount = statement.columnCount();
-				for (int i = 0; i < columnCount; i++) {
-					String columnName = statement.getColumnName(i);
-					fields.put(columnName, statement.columnString(i));
-				}
-
-				User user = new User(fields.get(FIELD_USERNAME));
-				user.setPasswordHash(fields.get(FIELD_PASSWORD));
-				user.setRole(Role.valueOf(fields.get(FIELD_ROLE)));
-				user.setFullName(fields.get(FIELD_FULLNAME));
-				user.setSecurityQuestion(fields.get(FIELD_SECURITY_QUESTION));
-				user.setSecurityAnswer(fields.get(FIELD_SECURITY_ANSWER));
-
-				users.add(user);
-			}
-
-			statement.dispose();
-		} catch (SQLiteException e) {
-			showError(e, "Failed to get users. SQL used was\n" + sql);
+		if (users.isEmpty()) {
+			System.err
+					.println("No user with username " + userName + " exists.");
+			return null;
 		}
 
-		return users;
+		return users.get(0);
 	}
 
 	public boolean userExists(String userName) {
@@ -162,7 +108,7 @@ public class Database
 	public boolean securityAnswerMatches(String userName, String securityAnswer) {
 		return userDataMatches(userName, FIELD_SECURITY_ANSWER, securityAnswer);
 	}
-	
+
 	/**
 	 * 
 	 * @param userName
@@ -174,16 +120,15 @@ public class Database
 		return userDataMatches(userName, FIELD_PASSWORD, password);
 	}
 
+	public String getSecurityQuestion(String userName) {
+		return getUserData(userName, FIELD_SECURITY_QUESTION);
 
-	public String getSecurityQuestion(String userName)
-	{
-		return "Everyone Likes cats dont they";
-		
+		// return "Everyone Likes cats dont they";
 	}
-	public String getSecurityAnswer(String userName)
-	{
-		return "cats";
-		
+
+	public String getSecurityAnswer(String userName) {
+		return getUserData(userName, FIELD_SECURITY_ANSWER);
+		// return "cats";
 	}
 
 	/**
@@ -259,11 +204,61 @@ public class Database
 		}
 	}
 
+	/**
+	 * Update this method if user fields change.
+	 * 
+	 * @param userName
+	 *            UserName of the user to be retrieved. Use null to get all
+	 *            users.
+	 * @return List of Users
+	 */
+	private List<User> getUsers(String userName) {
+		List<User> users = new ArrayList<User>();
+
+		String sql = "SELECT " + CSV_USER_TABLE_FIELDS + " FROM " + TABLE_USER;
+		sql += (userName == null) ? ";" : " WHERE " + FIELD_USERNAME + " = ?;";
+
+		try {
+			SQLiteStatement statement = dbConnection.prepare(sql);
+
+			if (userName != null) {
+				statement.bind(1, userName);
+			}
+
+			while (statement.step()) {
+				Map<String, String> fields = new HashMap<String, String>();
+
+				int columnCount = statement.columnCount();
+				for (int i = 0; i < columnCount; i++) {
+					String columnName = statement.getColumnName(i);
+					fields.put(columnName, statement.columnString(i));
+				}
+
+				User user = new User(fields.get(FIELD_USERNAME));
+				user.setPasswordHash(fields.get(FIELD_PASSWORD));
+				user.setRole(Role.valueOf(fields.get(FIELD_ROLE)));
+				user.setFullName(fields.get(FIELD_FULLNAME));
+				user.setSecurityQuestion(fields.get(FIELD_SECURITY_QUESTION));
+				user.setSecurityAnswer(fields.get(FIELD_SECURITY_ANSWER));
+
+				users.add(user);
+			}
+
+			statement.dispose();
+		} catch (SQLiteException e) {
+			showError(e, "Failed to get users. SQL used was\n" + sql);
+		}
+
+		return users;
+	}
+
 	private boolean userDataMatches(String userName, String fieldName,
 			String expectedValue) {
 		String fieldData = getUserData(userName, fieldName);
 		if (fieldData == null) {
-			System.err.println("Database probably does not contain a user named " + userName );
+			System.err
+					.println("Database probably does not contain a user named "
+							+ userName);
 			return false;
 		}
 		return fieldData.equals(expectedValue);
@@ -309,6 +304,34 @@ public class Database
 		}
 	}
 
+	private SQLiteConnection dbConnection;
 
+	public static final String TABLE_USER = "User";
+	public static final String FIELD_USERNAME = "Username";
+	public static final String FIELD_PASSWORD = "Password";
+	public static final String FIELD_FULLNAME = "FullName";
+	public static final String FIELD_SECURITY_QUESTION = "SecurityQuestion";
+	public static final String FIELD_SECURITY_ANSWER = "SecurityAnswer";
+	public static final String FIELD_ROLE = "Role";
+
+	private static final File DEFAULT_DB_FILE = new File("users.sqlite");
+
+	private static final String FIELD_USER_ID = "UserID";
+	private static final String SCHEMA_USER_TABLE =
+	/*  */FIELD_USER_ID + " INTEGER PRIMARY KEY, " +
+	/*  */FIELD_USERNAME + " TEXT UNIQUE, " +
+	/*  */FIELD_PASSWORD + " TEXT, " +
+	/*  */FIELD_FULLNAME + " TEXT, " +
+	/*  */FIELD_SECURITY_QUESTION + " TEXT, " +
+	/*  */FIELD_SECURITY_ANSWER + " TEXT, " +
+	/*  */FIELD_ROLE + " text";
+
+	/**
+	 * Update this string if user fields change.
+	 */
+	private static final String CSV_USER_TABLE_FIELDS = FIELD_USERNAME + ", "
+			+ FIELD_PASSWORD + ", " + FIELD_FULLNAME + ", "
+			+ FIELD_SECURITY_QUESTION + ", " + FIELD_SECURITY_ANSWER + ", "
+			+ FIELD_ROLE;
 
 }

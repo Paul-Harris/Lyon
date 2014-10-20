@@ -40,6 +40,24 @@ public class DatabaseTests
 	}
 
 	@Test
+	public void testAddUserAndGetUser() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		User userInDB = db.getUser(testUser.getUserName());
+
+		// userInDB should not be null
+		assertFalse(userInDB == null);
+
+		// All the fields should be equal
+		assertUserFieldsEqual(testUser, userInDB);
+	}
+
+	@Test
 	public void testAddAndDeleteOneUser() {
 		// Create an in-memory test database
 		Database db = new Database(null);
