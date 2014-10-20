@@ -1,4 +1,6 @@
 package main;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,8 +18,10 @@ public class UserManagement
 {
 	private Database db = new Database();
 	private PasswordSecurity ps = new PasswordSecurity();
+	private ExecuteShellComand esc = new ExecuteShellComand();
+	
 	private boolean success = false;
-		
+	private String customerAPI = "emtpy";	
 	//Receives from other java classes
 	
 	//Receives commands from command line
@@ -73,6 +77,9 @@ public class UserManagement
 		{
 			success = true;
 		}
+		
+		//executes shell command to send back information to customers application 
+		esc.executeCommand(customerAPI);
 		
 	}
 	
@@ -156,5 +163,36 @@ public class UserManagement
 		
 		
 	}
+	
+	//Sends responses to users custom program via shell
+	public class ExecuteShellComand {
+	
+		private String executeCommand(String command) {
+	 
+			StringBuffer output = new StringBuffer();
+	 
+			Process p;
+			try {
+				p = Runtime.getRuntime().exec(command);
+				p.waitFor();
+				BufferedReader reader = 
+	                            new BufferedReader(new InputStreamReader(p.getInputStream()));
+	 
+	                        String line = "";			
+				while ((line = reader.readLine())!= null) {
+					output.append(line + "\n");
+				}
+	 
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	 
+			return output.toString();
+	 
+		}
+	 
+	}
+	
+	
 }
 
