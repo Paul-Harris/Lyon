@@ -21,6 +21,7 @@ import com.almworks.sqlite4java.SQLiteStatement;
 
 public class Database
 {
+
 	private SQLiteConnection dbConnection;
 
 	public static final String TABLE_USER = "User";
@@ -43,6 +44,9 @@ public class Database
 	/*  */FIELD_SECURITY_ANSWER + " TEXT, " +
 	/*  */FIELD_ROLE + " text";
 
+	/**
+	 * Update this string if user fields change.
+	 */
 	private static final String CSV_USER_TABLE_FIELDS = FIELD_USERNAME + ", "
 			+ FIELD_PASSWORD + ", " + FIELD_FULLNAME + ", "
 			+ FIELD_SECURITY_QUESTION + ", " + FIELD_SECURITY_ANSWER + ", "
@@ -57,7 +61,7 @@ public class Database
 	}
 
 	/**
-	 * Update this method if CSV_USER_TABLE_FIELDS changes.
+	 * Update this method if user fields change.
 	 * 
 	 * @return A list of all users.
 	 */
@@ -98,34 +102,14 @@ public class Database
 	}
 
 	public boolean userExists(String userName) {
-		String sql = "SELECT " + FIELD_USERNAME + " FROM " + TABLE_USER
-				+ " WHERE " + FIELD_USERNAME + " = ?;";
-		SQLiteStatement statement = null;
-		try {
-			statement = dbConnection.prepare(sql);
-
-			statement.bind(1, userName);
-
-			while (statement.step()) {
-				if (statement.columnString(0).equals(userName)) {
-					return true;
-				}
-			}
-			return false;
-		} catch (SQLiteException e) {
-			showError(e, "Error checking whether user " + userName + " exists.");
-			return false;
-		} finally {
-			disposeIfNotNull(statement);
-		}
+		return userDataMatches(userName, FIELD_USERNAME, userName);
 	}
 
 	/**
-	 * Update this method if CSV_USER_TABLE_FIELDS changes.
+	 * Update this method if user fields change.
 	 * 
 	 * @return true if user added successfully
 	 */
-
 	public boolean addUser(User user) {
 		String sql = "INSERT INTO " + TABLE_USER + " (" + CSV_USER_TABLE_FIELDS
 				+ ")  values (?, ?, ?, ?, ?, ?);";
@@ -150,12 +134,11 @@ public class Database
 		} finally {
 			disposeIfNotNull(statement);
 		}
-
 	}
 
 	/**
 	 * 
-	 * @return true if user removed successfully
+	 * @return True if user removed successfully
 	 */
 	public boolean deleteUser(String userName) {
 		String sql = "DELETE FROM " + TABLE_USER + " WHERE " + FIELD_USERNAME
@@ -176,13 +159,21 @@ public class Database
 		}
 	}
 
-	public boolean securityAnswerCorrect(String userName, String securityAnswer) {
-		return false;
+	public boolean securityAnswerMatches(String userName, String securityAnswer) {
+		return userDataMatches(userName, FIELD_SECURITY_ANSWER, securityAnswer);
+	}
+	
+	/**
+	 * 
+	 * @param userName
+	 * @param password
+	 *            The hashed password
+	 * @return
+	 */
+	public boolean passwordMatches(String userName, String password) {
+		return userDataMatches(userName, FIELD_PASSWORD, password);
 	}
 
-	public boolean passwordCorrect(String userName, String password) {
-		return false;
-	}
 
 	public String getSecurityQuestion(String userName)
 	{
@@ -194,20 +185,26 @@ public class Database
 		return "cats";
 		
 	}
-	
-	public String getPassword(String userName) 
-	{
-		// testing only this hash is for "cats"
 
-		String password = "1c0fb5008c573315e7b1e1af5ab41d0ce9b8d4469e41c4d59c3041bd99671208c415fcb0359418dd6bc481863d3d5d030a75364318afbec54cdba082df3f9577";
-		return password;
+	/**
+	 * 
+	 * @param userName
+	 * @return The hashed password
+	 */
+	public String getPassword(String userName) {
+		return getUserData(userName, FIELD_PASSWORD);
+
+		// testing only this hash is for "cats"
+		// String password =
+		// "1c0fb5008c573315e7b1e1af5ab41d0ce9b8d4469e41c4d59c3041bd99671208c415fcb0359418dd6bc481863d3d5d030a75364318afbec54cdba082df3f9577";
 	}
 
 	/**
 	 * 
 	 * @param userName
 	 * @param newPassword
-	 * @return true if password change successful
+	 *            The new hashed password
+	 * @return True if password change successful
 	 */
 	public boolean changePassword(String userName, String newPassword) {
 		return false;
@@ -217,7 +214,7 @@ public class Database
 	 * 
 	 * @param userName
 	 * @param newFullName
-	 * @return true if name change successful
+	 * @return True if name change successful
 	 */
 	public boolean changeFullName(String userName, String newFullName) {
 		return false;
@@ -228,7 +225,7 @@ public class Database
 	 * @param userName
 	 * @param newSecurityQuestion
 	 * @param newSecurityAnswer
-	 * @return true if security question and answer were successfully changed
+	 * @return True if security question and answer were successfully changed
 	 */
 	public boolean changeSecurityQuestionAndAnswer(String userName,
 			String newSecurityQuestion, String newSecurityAnswer) {
@@ -237,10 +234,6 @@ public class Database
 
 	public boolean isConnected() {
 		return dbConnection.isOpen();
-	}
-
-	public SQLiteConnection getConnection() {
-		return dbConnection;
 	}
 
 	private void initialize(File dbFile) {
@@ -266,6 +259,40 @@ public class Database
 		}
 	}
 
+	private boolean userDataMatches(String userName, String fieldName,
+			String expectedValue) {
+		String fieldData = getUserData(userName, fieldName);
+		if (fieldData == null) {
+			System.err.println("Database probably does not contain a user named " + userName );
+			return false;
+		}
+		return fieldData.equals(expectedValue);
+	}
+
+	private String getUserData(String userName, String fieldName) {
+		SQLiteStatement statement = null;
+
+		String sql = "SELECT " + fieldName + " FROM " + TABLE_USER + " WHERE "
+				+ FIELD_USERNAME + " = ?;";
+
+		try {
+			statement = dbConnection.prepare(sql);
+
+			statement.bind(1, userName);
+
+			while (statement.step()) {
+				return statement.columnString(0);
+			}
+			return null;
+		} catch (SQLiteException e) {
+			showError(e, "Error getting " + fieldName + " for user " + userName
+					+ ".\nSQL Used was: " + sql);
+			return null;
+		} finally {
+			disposeIfNotNull(statement);
+		}
+	}
+
 	private void showError(Exception e, String message) {
 		System.err.println(message);
 		e.printStackTrace();
@@ -281,5 +308,7 @@ public class Database
 		while (st.step()) {
 		}
 	}
+
+
 
 }

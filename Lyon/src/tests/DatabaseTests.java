@@ -31,11 +31,11 @@ public class DatabaseTests
 
 		List<User> users = db.getUsers();
 
-		// There should be only 1 user
+		// There should be only one user
 		assertEquals(users.size(), 1);
 		User user1 = users.get(0);
 
-		// Make sure all the fields are equal
+		// All the fields should be equal
 		assertUserFieldsEqual(testUser, user1);
 	}
 
@@ -83,7 +83,7 @@ public class DatabaseTests
 		List<User> users = db.getUsers();
 		assertEquals(users.size(), 1);
 
-		// The one user left should have testUserB's information
+		// That user should have the same information as testUserB
 		assertUserFieldsEqual(users.get(0), testUserB);
 	}
 
@@ -98,6 +98,21 @@ public class DatabaseTests
 
 		assertTrue(db.userExists(testUser.getUserName()));
 		assertFalse(db.userExists(testUser.getUserName() + "0"));
+	}
+
+	@Test
+	public void testUserPasswordMatches() {
+		// Create an in-memory test database
+		Database db = new Database(null);
+
+		User testUser = createTestUserWithRandomInfo();
+
+		db.addUser(testUser);
+
+		assertTrue(db.passwordMatches(testUser.getUserName(),
+				testUser.getPasswordHash()));
+		assertFalse(db.passwordMatches(testUser.getUserName(),
+				testUser.getPasswordHash() + "0"));
 	}
 
 	private void assertUserFieldsEqual(User userA, User userB) {
