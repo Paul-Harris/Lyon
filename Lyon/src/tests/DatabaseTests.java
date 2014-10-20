@@ -135,15 +135,15 @@ public class DatabaseTests
 		db.addUser(testUser);
 
 		try {
-			assertTrue(db.passwordMatches(testUser.getUserName(),
-					testUser.getPasswordHash()));
+			assertEquals(db.getPassword(testUser.getUserName()),
+					testUser.getPasswordHash());
 		} catch (NoSuchUserException e) {
 			fail();
 		}
 
 		try {
-			assertFalse(db.passwordMatches(testUser.getUserName(),
-					testUser.getPasswordHash() + "0"));
+			assertNotEquals(db.getPassword(testUser.getUserName()),
+					testUser.getPasswordHash() + "0");
 		} catch (NoSuchUserException e) {
 			fail();
 		}
