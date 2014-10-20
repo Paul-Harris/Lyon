@@ -55,11 +55,15 @@ public class UserManagement
 			signUp(cmd);
 		//Check verification
 		break;
+		case "resetpassword":
+			resetPassword(cmd);
+		break;
 		}	
 	}
 	
 	public void delete(ArrayList<String> cmd)
 	{
+		
 		
 	}
 	
@@ -74,8 +78,34 @@ public class UserManagement
 	
 	public void signUp(ArrayList<String> cmd)
 	{
-		db.addUser(cmd);
+		
+		ArrayList<String> newUser = new ArrayList<String>();
+		
+		for(int i = 0; cmd.size() > i; i ++)
+		{
+			if(i == 3)
+				newUser.add(ps.createHash(cmd.get(i)));
+			else
+				newUser.add(cmd.get(i));
+		
+
+		}
+		db.addUser(newUser);
 		success = true;
+		
+	}
+	
+	public void resetPassword(ArrayList<String> cmd)
+	{
+		//checks to see if the security answer matches what is in the BD
+		if(cmd.get(1).equals(db.getSecurityAnswer(cmd.get(0))) == true)
+		{
+			db.changePassword(cmd.get(0), ps.createHash(cmd.get(2)));
+			
+			//Verifies that the password was succcesfully changed
+			if( db.getPassword(cmd.get(0)).equals(ps.createHash(cmd.get(2))) == true)
+				success = true;
+		}
 		
 	}
 	

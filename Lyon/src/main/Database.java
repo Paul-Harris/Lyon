@@ -25,6 +25,9 @@ public class Database {
 	 * @return true if user added successfully
 	 */
 	public boolean addUser(ArrayList<String> parameters) {
+		
+		//Test to show that resiter is working 
+		//System.out.println(parameters.toString());
 		return false;
 	}
 
@@ -45,6 +48,16 @@ public class Database {
 		return false;
 	}
 	
+	public String getSecurityQuestion(String userName)
+	{
+		return "Everyone Likes cats dont they";
+		
+	}
+	public String getSecurityAnswer(String userName)
+	{
+		return "cats";
+		
+	}
 	public String getPassword(String userName)
 	{
 		//testing only this hash is for "cats"
