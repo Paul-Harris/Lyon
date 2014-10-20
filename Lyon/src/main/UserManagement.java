@@ -81,7 +81,7 @@ public class UserManagement
 		}
 		
 		//executes shell command to send back information to customers application 
-		esc.executeCommand(customerAPI);
+		//esc.executeCommand(customerAPI);
 		
 	}
 	
