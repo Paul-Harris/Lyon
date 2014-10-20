@@ -24,9 +24,11 @@ public class GraphicalUserInterface {
 	public static JFrame registerFrame = new JFrame("Password Manager");
 	static UserManagement um;
 	static ArrayList<String> cmd;
+	private static JTextField roleText;
 
 	public static void main(String[] args) {
 		loginFrame(true);
+		//registerFrame(true);
 	}
 
 	static void loginFrame(boolean visibility) {
@@ -35,31 +37,31 @@ public class GraphicalUserInterface {
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loginFrame.setVisible(visibility);
 		
-		loginFrame.setLayout(null);
+		loginFrame.getContentPane().setLayout(null);
 
 		JLabel userLabel = new JLabel("User Name");
 		userLabel.setBounds(10, 10, 80, 25);
-		loginFrame.add(userLabel);
+		loginFrame.getContentPane().add(userLabel);
 
 		final JTextField userText = new JTextField(20);
 		userText.setBounds(100, 10, 160, 25);
-		loginFrame.add(userText);
+		loginFrame.getContentPane().add(userText);
 
 		JLabel passwordLabel = new JLabel("Password");
 		passwordLabel.setBounds(10, 40, 80, 25);
-		loginFrame.add(passwordLabel);
+		loginFrame.getContentPane().add(passwordLabel);
 
 		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(100, 40, 160, 25);
-		loginFrame.add(passwordText);
+		loginFrame.getContentPane().add(passwordText);
 
 		JButton loginButton = new JButton("Login");
 		loginButton.setBounds(10, 80, 100, 25);
-		loginFrame.add(loginButton);
+		loginFrame.getContentPane().add(loginButton);
 
 		JButton registerButton = new JButton("Register");
 		registerButton.setBounds(160, 80, 100, 25);
-		loginFrame.add(registerButton);
+		loginFrame.getContentPane().add(registerButton);
 
 
 		loginButton.addActionListener(new ActionListener() {
@@ -101,66 +103,76 @@ public class GraphicalUserInterface {
 		registerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		registerFrame.setVisible(visibility);
 		
-		registerFrame.setLayout(null);
+		registerFrame.getContentPane().setLayout(null);
 
 		//First Name
 		JLabel firstNameLabel = new JLabel("First Name");
 		firstNameLabel.setBounds(10, 10, 80, 30);
-		registerFrame.add(firstNameLabel);
+		registerFrame.getContentPane().add(firstNameLabel);
 
 		final JTextField firstNameText = new JTextField(20);
 		firstNameText.setBounds(150, 10, 160, 25);
-		registerFrame.add(firstNameText);
+		registerFrame.getContentPane().add(firstNameText);
 		
 		//Last Name
 		JLabel lastNameLabel = new JLabel("Last Name");
 		lastNameLabel.setBounds(10, 40, 80, 25);
-		registerFrame.add(lastNameLabel);
+		registerFrame.getContentPane().add(lastNameLabel);
 
 		final JTextField lastNameText = new JTextField(20);
 		lastNameText.setBounds(150, 40, 160, 25);
-		registerFrame.add(lastNameText);
+		registerFrame.getContentPane().add(lastNameText);
 		
 		//Username
 		JLabel userNameLabel = new JLabel("UserName");
 		userNameLabel.setBounds(10, 70, 80, 25);
-		registerFrame.add(userNameLabel);
+		registerFrame.getContentPane().add(userNameLabel);
 
 		final JTextField userNameText = new JTextField(20);
 		userNameText.setBounds(150, 70, 160, 25);
-		registerFrame.add(userNameText);
+		registerFrame.getContentPane().add(userNameText);
 		
 		//Password
 		JLabel passwordLabel = new JLabel("Password");
 		passwordLabel.setBounds(10, 100, 80, 25);
-		registerFrame.add(passwordLabel);
+		registerFrame.getContentPane().add(passwordLabel);
 
 		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(150, 100, 160, 25);
-		registerFrame.add(passwordText);
+		registerFrame.getContentPane().add(passwordText);
 		
 		//Security Question
 		JLabel questionLabel = new JLabel("Security Question");
 		questionLabel.setBounds(10, 130, 120, 25);
-		registerFrame.add(questionLabel);
+		registerFrame.getContentPane().add(questionLabel);
 
 		final JTextField questionText = new JTextField(20);
 		questionText.setBounds(150, 130, 160, 25);
-		registerFrame.add(questionText);
+		registerFrame.getContentPane().add(questionText);
 		
 		//Security Answer
 		JLabel answerLabel = new JLabel("Security Answer");
 		answerLabel.setBounds(10, 160, 100, 25);
-		registerFrame.add(answerLabel);
+		registerFrame.getContentPane().add(answerLabel);
 
 		final JTextField answerText = new JTextField(20);
 		answerText.setBounds(150, 160, 160, 25);
-		registerFrame.add(answerText);
+		registerFrame.getContentPane().add(answerText);
+		
+		JLabel roleLabel = new JLabel("Role");
+		roleLabel.setBounds(10, 191, 100, 25);
+		registerFrame.getContentPane().add(roleLabel);
+		
+		roleText = new JTextField(20);
+		roleText.setBounds(150, 190, 160, 25);
+		registerFrame.getContentPane().add(roleText);
 
 		//register
 		JButton registerButton = new JButton("Register");
-		registerButton.setBounds(50, 200, 100, 25);
-		registerFrame.add(registerButton);
+		registerButton.setBounds(50, 228, 100, 25);
+		registerFrame.getContentPane().add(registerButton);
+		
+		
 		
 		registerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -184,8 +196,10 @@ public class GraphicalUserInterface {
 	});		
 		
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setBounds(180, 200, 100, 25);
-		registerFrame.add(cancelButton);
+		cancelButton.setBounds(180, 228, 100, 25);
+		registerFrame.getContentPane().add(cancelButton);
+		
+		
 		
 		cancelButton.addActionListener(new ActionListener() {
 			@Override
