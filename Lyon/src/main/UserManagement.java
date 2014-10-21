@@ -12,13 +12,12 @@ import java.util.List;
 import main.Database.NoSuchUserException;
 
 /**
- * @author The Bomb Squad
- * Created : October 14, 2014
- * Purpose : UserManagment is the view of Lyon password management system.
- * Interactions : Being the controller is pulls data from the database and pushes changes and updates.
+ * @author The Bomb Squad Created : October 14, 2014 Purpose : UserManagment is
+ *         the view of Lyon password management system. Interactions : Being the
+ *         controller is pulls data from the database and pushes changes and
+ *         updates.
  * 
  */
-
 
 public class UserManagement
 {
@@ -28,59 +27,57 @@ public class UserManagement
 
 	private boolean success = false;
 	private String outputMessage = "";
-	private String customerAPI = "emtpy";
 
 	private final String MESSAGE_PASSWORD_REQUIREMENTS = /**/
-	"Passwords must be at least 8 characters and have at least one capital letter. \n"
-			+ "They may use digits, letters, and any of the following symbols: ! & * ?";
+	"Passwords must be 8-10 characters in length.\n"
+			+ "Passwords must have at least one digit and at least one capital letter.\n"
+			+ "Passwords allow only digits, letters, and these symbols: ! & * ?";
 
 	// Receives from other java classes
+	private String customerAPI = "empty";
 
 	// Receives commands from command line
 	public UserManagement(String[] args) {
 		this.command(Arrays.asList(args));
 	}
 
-	// Receives commands from java api
+	// Receives commands from Java API
 	public UserManagement(List<String> cmd) {
 		command(cmd);
-
 	}
 
 	public void command(List<String> cmd) {
 		String toDo = cmd.remove(0);
 		switch (toDo) {
 		case "delete":
-			delete(cmd);
 			// what to do when deleting
+			delete(cmd);
 			break;
 		case "signin":
-
-			signIn(cmd);
 			// Check verification
-
+			signIn(cmd);
 			break;
 		case "signup":
-			signUp(cmd);
 			// Check verification
+			signUp(cmd);
 			break;
 		case "resetpassword":
-			resetPassword(cmd);
+			changePasswordUsingSecurityAnswer(cmd);
 			break;
 		case "changepassword":
-			changePassword(cmd);
+			changePasswordUsingOldPassword(cmd);
 			break;
 		}
 	}
 
-	private void changePassword(List<String> cmd) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public void delete(List<String> cmd) {
 		// TODO Display message if error occurred
-		db.deleteUser(cmd.get(0));
+		if (db.deleteUser(cmd.get(0))) {
+			success = true;
+		} else {
+			outputMessage = "Could not delete user. Error was "
+					+ db.getLastError();
+		}
 	}
 
 	public void signIn(List<String> cmd) {
@@ -104,6 +101,7 @@ public class UserManagement
 		String userName = cmd.get(0);
 		User user = new User(userName);
 
+		// Validate that the password meets password requirements
 		if (!validatePassword(cmd.get(1))) {
 
 			outputMessage = "Could not register user. "
@@ -130,30 +128,56 @@ public class UserManagement
 		return false;
 	}
 
-	public void resetPassword(List<String> cmd) {
+	public void changePasswordUsingSecurityAnswer(List<String> cmd) {
 		String userName = cmd.get(0);
 		String securityAnswer = cmd.get(1);
 
-		String password = cmd.get(2);
+		String newPassword = cmd.get(2);
 
-		if (!validatePassword(password)) {
+		// Make sure the security answer matches what is in the DB
+		try {
+			if (securityAnswer.equals(db.getSecurityAnswer(userName))) {
+
+				changePassword(userName, newPassword);
+			}
+		} catch (NoSuchUserException e) {
+			outputMessage = "User " + userName + " does not exist.";
+		}
+	}
+
+	private void changePasswordUsingOldPassword(List<String> cmd) {
+		String userName = cmd.get(0);
+		String hashedOldPassword = ps.createHash(cmd.get(1));
+
+		String newPassword = cmd.get(2);
+
+		try {
+			if (hashedOldPassword.equals(db.getPassword(userName))) {
+				changePassword(userName, newPassword);
+			}
+		} catch (NoSuchUserException e) {
+			outputMessage = "User " + userName + " does not exist.";
+		}
+
+	}
+
+	private void changePassword(String userName, String newPassword) {
+
+		// Validate that the new password meets password requirements
+		if (!validatePassword(newPassword)) {
 			outputMessage = "Could not change password. "
 					+ MESSAGE_PASSWORD_REQUIREMENTS;
 			return;
 		}
 
-		String hashedNewPassword = ps.createHash(password);
+		String hashedNewPassword = ps.createHash(newPassword);
 
-		// checks to see if the security answer matches what is in the DB
 		try {
-			if (securityAnswer.equals(db.getSecurityAnswer(userName))) {
+			db.changePassword(userName, hashedNewPassword);
 
-				db.changePassword(userName, hashedNewPassword);
-
-				// Verifies that the password was succcesfully changed
-				if (db.getPassword(userName).equals(hashedNewPassword)) {
-					success = true;
-				}
+			// Verify the password was succcesfully changed
+			if (db.getPassword(userName).equals(hashedNewPassword)) {
+				success = true;
 			}
 		} catch (NoSuchUserException e) {
 			outputMessage = "User " + userName + " does not exist.";
