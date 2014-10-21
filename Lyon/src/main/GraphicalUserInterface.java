@@ -22,18 +22,20 @@ public class GraphicalUserInterface {
 	
 	public static JFrame loginFrame = new JFrame("Password Manager");
 	public static JFrame registerFrame = new JFrame("Password Manager");
+	public static JFrame adminFrame = new JFrame("Password Manager");
+	public static JFrame editFrame = new JFrame("Password Manager");
+	public static JFrame forgotFrame = new JFrame("Password Manager");
 	static UserManagement um;
 	static ArrayList<String> cmd;
 	private static JTextField roleText;
 
 	public static void main(String[] args) {
 		loginFrame(true);
-		//registerFrame(true);
 	}
 
 	static void loginFrame(boolean visibility) {
 		
-		loginFrame.setSize(300, 150);
+		loginFrame.setSize(300, 200);
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loginFrame.setVisible(visibility);
 		
@@ -55,14 +57,24 @@ public class GraphicalUserInterface {
 		passwordText.setBounds(100, 40, 160, 25);
 		loginFrame.getContentPane().add(passwordText);
 
+		JButton forgotButton = new JButton("Forgot Password");
+		forgotButton.setBounds(70, 80, 150, 25);
+		loginFrame.getContentPane().add(forgotButton);
+		
 		JButton loginButton = new JButton("Login");
-		loginButton.setBounds(10, 80, 100, 25);
+		loginButton.setBounds(10, 110, 100, 25);
 		loginFrame.getContentPane().add(loginButton);
 
 		JButton registerButton = new JButton("Register");
-		registerButton.setBounds(160, 80, 100, 25);
+		registerButton.setBounds(160, 110, 100, 25);
 		loginFrame.getContentPane().add(registerButton);
 
+		forgotButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				forgotFrame(true);
+			}
+		});
 
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -81,8 +93,10 @@ public class GraphicalUserInterface {
 				loginFrame.dispose();
 			}
 			else
-				JOptionPane.showMessageDialog(source, "Incorrect Username or Password");
-			
+			{
+				adminFrame(true);
+				//JOptionPane.showMessageDialog(source, "Incorrect Username or Password");
+			}
 			
 		}
 	});
@@ -210,5 +224,175 @@ public class GraphicalUserInterface {
 		
 		
 	}
+	
+	
+	
+static void adminFrame(boolean visibility) {
+		
+	adminFrame.setSize(350, 150);
+	adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	adminFrame.setVisible(visibility);
+		
+	adminFrame.getContentPane().setLayout(null);
+
+		JLabel userLabel = new JLabel("User Name");
+		userLabel.setBounds(10, 10, 80, 25);
+		adminFrame.getContentPane().add(userLabel);
+
+		final JTextField userText = new JTextField(20);
+		userText.setBounds(150, 10, 160, 25);
+		adminFrame.getContentPane().add(userText);
+		
+		JLabel pwLabel = new JLabel("User Password");
+		pwLabel.setBounds(10, 40, 100, 25);
+		adminFrame.getContentPane().add(pwLabel);
+
+		final JTextField pwText = new JTextField(20);
+		pwText.setBounds(150, 40, 160, 25);
+		adminFrame.getContentPane().add(pwText);
+
+		JButton editButton = new JButton("Edit");
+		editButton.setBounds(10, 80, 100, 25);
+		adminFrame.getContentPane().add(editButton);
+
+		JButton deleteButton = new JButton("Delete");
+		deleteButton.setBounds(160, 80, 100, 25);
+		adminFrame.getContentPane().add(deleteButton);
+
+
+		editButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				editFrame(true, userText.getText(), pwText.getText());
+		}
+	});
+		
+		deleteButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//RUN DELETE
+			}
+		});
+	}
+
+static void editFrame(boolean visibility, String username, String password) {
+	
+	editFrame.setSize(350, 200);
+	editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	editFrame.setVisible(visibility);
+		
+	editFrame.getContentPane().setLayout(null);
+
+		JLabel userLabel = new JLabel("User Name");
+		userLabel.setBounds(10, 10, 80, 25);
+		editFrame.getContentPane().add(userLabel);
+
+		final JTextField userText = new JTextField(20);
+		userText.setBounds(150, 10, 160, 25);
+		userText.setText(username);
+		editFrame.getContentPane().add(userText);
+		
+		JLabel pwLabel = new JLabel("Old Password");
+		pwLabel.setBounds(10, 40, 120, 25);
+		editFrame.getContentPane().add(pwLabel);
+
+		final JTextField pwText = new JTextField(20);
+		pwText.setBounds(150, 40, 160, 25);		
+		pwText.setText(password);
+		editFrame.getContentPane().add(pwText);
+		
+		JLabel newpwLabel = new JLabel("New Password");
+		newpwLabel.setBounds(10, 70, 120, 25);
+		editFrame.getContentPane().add(newpwLabel);
+
+		final JTextField newpwText = new JTextField(20);
+		newpwText.setBounds(150, 70, 160, 25);
+		editFrame.getContentPane().add(newpwText);
+
+		JButton saveButton = new JButton("Save");
+		saveButton.setBounds(10, 100, 100, 25);
+		editFrame.getContentPane().add(saveButton);
+
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setBounds(160, 100, 100, 25);
+		editFrame.getContentPane().add(cancelButton);
+
+
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//ADD CHANGE PASSWORD WITH OLD PASSWORD
+		}
+	});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				editFrame.dispose();
+			}
+		});
+	}
+
+static void forgotFrame(boolean visibility) {
+	
+	editFrame.setSize(350, 250);
+	editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	editFrame.setVisible(visibility);
+		
+	editFrame.getContentPane().setLayout(null);
+
+		JLabel userLabel = new JLabel("User Name");
+		userLabel.setBounds(10, 10, 120, 25);
+		editFrame.getContentPane().add(userLabel);
+
+		final JTextField userText = new JTextField(20);
+		userText.setBounds(150, 10, 160, 25);
+		editFrame.getContentPane().add(userText);
+		
+		JLabel questionLabel = new JLabel("Security Question");
+		questionLabel.setBounds(10, 40, 120, 25);
+		editFrame.getContentPane().add(questionLabel);
+
+		final JTextField questionText = new JTextField(20);
+		questionText.setBounds(150, 40, 160, 25);		
+		editFrame.getContentPane().add(questionText);
+		
+		JLabel answerLabel = new JLabel("Security Answer");
+		answerLabel.setBounds(10, 80, 120, 25);
+		editFrame.getContentPane().add(answerLabel);
+
+		final JTextField answerText = new JTextField(20);
+		answerText.setBounds(150, 80, 160, 25);		
+		editFrame.getContentPane().add(answerText);
+		
+		JLabel newpwLabel = new JLabel("New Password");
+		newpwLabel.setBounds(10, 120, 120, 25);
+		editFrame.getContentPane().add(newpwLabel);
+
+		final JTextField newpwText = new JTextField(20);
+		newpwText.setBounds(150, 120, 160, 25);
+		editFrame.getContentPane().add(newpwText);
+
+		JButton saveButton = new JButton("Save");
+		saveButton.setBounds(10, 150, 100, 25);
+		editFrame.getContentPane().add(saveButton);
+
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.setBounds(160, 150, 100, 25);
+		editFrame.getContentPane().add(cancelButton);
+
+
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				//ADD CHANGE PASSWORD WITH SECURITY QUESTION
+		}
+	});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				editFrame.dispose();
+			}
+		});
+	}
+
 }
 
