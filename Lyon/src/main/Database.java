@@ -37,7 +37,7 @@ public class Database
 		List<User> users = getUsers(userName);
 
 		if (users.isEmpty()) {
-			throw new NoSuchUserException();
+			throw new NoSuchUserException(userName);
 		}
 
 		return users.get(0);
@@ -89,7 +89,11 @@ public class Database
 	 * 
 	 * @return True if user removed successfully
 	 */
-	public boolean deleteUser(String userName) {
+	public boolean deleteUser(String userName) throws NoSuchUserException {
+		if (!userExists(userName)) {
+			throw new NoSuchUserException(userName);
+		}
+
 		String sql = "DELETE FROM " + TABLE_USER + " WHERE " + FIELD_USERNAME
 				+ " = ?;";
 		SQLiteStatement statement = null;
@@ -199,6 +203,15 @@ public class Database
 	public class NoSuchUserException extends Exception
 	{
 		private static final long serialVersionUID = 5654784800867083023L;
+		private String userName;
+
+		public NoSuchUserException(String username) {
+			this.userName = username;
+		}
+
+		public String getUserName() {
+			return userName;
+		}
 	}
 
 	private void initialize(File dbFile) {
@@ -287,7 +300,7 @@ public class Database
 			while (statement.step()) {
 				return statement.columnString(0);
 			}
-			throw new NoSuchUserException();
+			throw new NoSuchUserException(userName);
 		} catch (SQLiteException e) {
 			showError(e, "Error getting " + fieldName + " for user " + userName
 					+ ".\nSQL Used was: " + sql);

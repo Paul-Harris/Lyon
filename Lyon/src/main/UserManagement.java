@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import main.Database.NoSuchUserException;
+import main.User.Role;
 
 /**
  * @author The Bomb Squad
@@ -38,34 +39,59 @@ public class UserManagement
 	}
 
 	// Receives commands from Java API
-	public UserManagement(List<String> cmd) {
-		command(cmd);
+	public UserManagement(List<String> args) {
+		command(args);
 	}
 
-	public void command(List<String> cmd) {
-		String toDo = cmd.remove(0);
-		switch (toDo) {
-		case "delete":
-			delete(cmd);
-			break;
-		case "signin":
-			signIn(cmd);
-			break;
-		case "signup":
-			signUp(cmd);
-			break;
-		case "resetpassword":
-			changePasswordUsingSecurityAnswer(cmd);
-			break;
-		case "changepassword":
-			changePasswordUsingOldPassword(cmd);
-			break;
+	public void command(List<String> args) {
+		String toDo = args.remove(0);
+		try {
+			switch (toDo) {
+			case "signin":
+				signIn(args);
+				break;
+			case "signup":
+				signUp(args);
+				break;
+			case "resetpassword":
+				changePasswordUsingSecurityAnswer(args);
+				break;
+			case "delete":
+				delete(args);
+				break;
+			case "changepassword":
+				changePasswordUsingOldPassword(args);
+				break;
+			default:
+				outputMessage = "Invalid command. Type help for a list of possible commands.";
+				break;
+			}
+		} catch (NoSuchUserException e) {
+			outputMessage = "User " + e.getUserName() + " does not exist.";
+
 		}
 	}
 
-	public void delete(List<String> cmd) {
+	// private void changeInfo(List<String> args) throws NoSuchUserException {
+	// String affectedUserName = args.get(0);
+	//
+	// String loginUserName = args.get(1);
+	// String loginPassword = args.get(2);
+	//
+	// if (!affectedUserName.equals(loginUserName)) {
+	// if (db.getRole(loginUserName).equals(Role.USER.toString())) {
+	//
+	// }
+	// }
+	// // TODO Auto-generated method stub
+	//
+	// }
+
+	public void delete(List<String> args) throws NoSuchUserException {
+		// TODO: Require admin credentials
+
 		// TODO Display message if error occurred
-		if (db.deleteUser(cmd.get(0))) {
+		if (db.deleteUser(args.get(0))) {
 			success = true;
 		} else {
 			outputMessage = "Could not delete user. Error was "
@@ -73,10 +99,10 @@ public class UserManagement
 		}
 	}
 
-	public void signIn(List<String> cmd) {
+	public void signIn(List<String> args) throws NoSuchUserException {
 
-		String userName = cmd.get(0);
-		String hashedPassword = cmd.get(1);
+		String userName = args.get(0);
+		String hashedPassword = args.get(1);
 		if (ps.verifyPassword(userName, hashedPassword)) {
 			success = true;
 		} else {
@@ -89,23 +115,23 @@ public class UserManagement
 
 	}
 
-	public void signUp(List<String> cmd) {
+	public void signUp(List<String> args) {
 
-		String userName = cmd.get(0);
+		String userName = args.get(0);
 		User user = new User(userName);
 
 		// Validate that the password meets password requirements
-		if (!validatePassword(cmd.get(1))) {
+		if (!validatePassword(args.get(1))) {
 
 			outputMessage = "Could not register user. "
 					+ MESSAGE_PASSWORD_REQUIREMENTS;
 			return;
 		}
 
-		user.setPasswordHash(ps.createHash(cmd.get(1)));
-		user.setFullName(cmd.get(2));
-		user.setSecurityQuestion(cmd.get(3));
-		user.setSecurityAnswer(cmd.get(4)); // TODO: Hash security answer?
+		user.setPasswordHash(ps.createHash(args.get(1)));
+		user.setFullName(args.get(2));
+		user.setSecurityQuestion(args.get(3));
+		user.setSecurityAnswer(args.get(4)); // TODO: Hash security answer?
 
 		success = db.addUser(user);
 
@@ -121,35 +147,27 @@ public class UserManagement
 		return false;
 	}
 
-	public void changePasswordUsingSecurityAnswer(List<String> cmd) {
-		String userName = cmd.get(0);
-		String securityAnswer = cmd.get(1);
-
-		String newPassword = cmd.get(2);
+	public void changePasswordUsingSecurityAnswer(List<String> args)
+			throws NoSuchUserException {
+		String userName = args.get(0);
+		String securityAnswer = args.get(1);
+		String newPassword = args.get(2);
 
 		// Make sure the security answer matches what is in the DB
-		try {
-			if (securityAnswer.equals(db.getSecurityAnswer(userName))) {
-
-				changePassword(userName, newPassword);
-			}
-		} catch (NoSuchUserException e) {
-			outputMessage = "User " + userName + " does not exist.";
+		if (securityAnswer.equals(db.getSecurityAnswer(userName))) {
+			changePassword(userName, newPassword);
 		}
 	}
 
-	public void changePasswordUsingOldPassword(List<String> cmd) {
+	public void changePasswordUsingOldPassword(List<String> cmd)
+			throws NoSuchUserException {
 		String userName = cmd.get(0);
 		String hashedOldPassword = ps.createHash(cmd.get(1));
 
 		String newPassword = cmd.get(2);
 
-		try {
-			if (hashedOldPassword.equals(db.getPassword(userName))) {
-				changePassword(userName, newPassword);
-			}
-		} catch (NoSuchUserException e) {
-			outputMessage = "User " + userName + " does not exist.";
+		if (hashedOldPassword.equals(db.getPassword(userName))) {
+			changePassword(userName, newPassword);
 		}
 
 	}
@@ -205,17 +223,9 @@ public class UserManagement
 
 		}
 
-		public boolean verifyPassword(String userName, String password) {
-			try {
-				if (db.getPassword(userName).equals(createHash(password))) {
-					return true;
-				} else {
-					return false;
-				}
-			} catch (NoSuchUserException e) {
-				outputMessage = "User " + userName + " does not exist.";
-				return false;
-			}
+		public boolean verifyPassword(String userName, String password)
+				throws NoSuchUserException {
+			return db.getPassword(userName).equals(createHash(password));
 		}
 
 	}
