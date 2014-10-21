@@ -2,21 +2,17 @@ package main;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import main.Database.NoSuchUserException;
 
 /**
- * @author The Bomb Squad Created : October 14, 2014 Purpose : UserManagment is
- *         the view of Lyon password management system. Interactions : Being the
- *         controller is pulls data from the database and pushes changes and
- *         updates.
- * 
+ * @author The Bomb Squad
+ * @version October 21, 2014
+ * @purpose UserManagment is the controller of Lyon password management system.
  */
 
 public class UserManagement
@@ -30,8 +26,8 @@ public class UserManagement
 
 	private final String MESSAGE_PASSWORD_REQUIREMENTS = /**/
 	"Passwords must be 8-10 characters in length.\n"
-			+ "Passwords must have at least one digit and at least one capital letter.\n"
-			+ "Passwords allow only digits, letters, and these symbols: ! & * ?";
+			+ "They must have at least one digit and at least one capital letter.\n"
+			+ "They allow only digits, letters, and these symbols: ! & * ?";
 
 	// Receives from other java classes
 	private String customerAPI = "empty";
@@ -50,15 +46,12 @@ public class UserManagement
 		String toDo = cmd.remove(0);
 		switch (toDo) {
 		case "delete":
-			// what to do when deleting
 			delete(cmd);
 			break;
 		case "signin":
-			// Check verification
 			signIn(cmd);
 			break;
 		case "signup":
-			// Check verification
 			signUp(cmd);
 			break;
 		case "resetpassword":
@@ -145,7 +138,7 @@ public class UserManagement
 		}
 	}
 
-	private void changePasswordUsingOldPassword(List<String> cmd) {
+	public void changePasswordUsingOldPassword(List<String> cmd) {
 		String userName = cmd.get(0);
 		String hashedOldPassword = ps.createHash(cmd.get(1));
 
@@ -161,7 +154,8 @@ public class UserManagement
 
 	}
 
-	private void changePassword(String userName, String newPassword) {
+	private void changePassword(String userName, String newPassword)
+			throws NoSuchUserException {
 
 		// Validate that the new password meets password requirements
 		if (!validatePassword(newPassword)) {
@@ -172,15 +166,11 @@ public class UserManagement
 
 		String hashedNewPassword = ps.createHash(newPassword);
 
-		try {
-			db.changePassword(userName, hashedNewPassword);
+		db.changePassword(userName, hashedNewPassword);
 
-			// Verify the password was succcesfully changed
-			if (db.getPassword(userName).equals(hashedNewPassword)) {
-				success = true;
-			}
-		} catch (NoSuchUserException e) {
-			outputMessage = "User " + userName + " does not exist.";
+		// Verify the password was succcesfully changed
+		if (db.getPassword(userName).equals(hashedNewPassword)) {
+			success = true;
 		}
 	}
 
