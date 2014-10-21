@@ -76,7 +76,12 @@ public class DatabaseTests
 		// There should be one user
 		assertEquals(db.getUsers().size(), 1);
 
-		db.deleteUser(testUser.getUserName());
+		try {
+			db.deleteUser(testUser.getUserName());
+		} catch (NoSuchUserException e) {
+			e.printStackTrace();
+			fail();
+		}
 
 		// There should be zero users
 		assertEquals(db.getUsers().size(), 0);
@@ -101,8 +106,14 @@ public class DatabaseTests
 		assertEquals(db.getUsers().size(), 3);
 
 		// Delete two of them
-		db.deleteUser(testUserC.getUserName());
-		db.deleteUser(testUserA.getUserName());
+		try {
+			db.deleteUser(testUserC.getUserName());
+			db.deleteUser(testUserA.getUserName());
+		} catch (NoSuchUserException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			fail();
+		}
 
 		// There should be one user
 		List<User> users = db.getUsers();
