@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,16 +28,37 @@ public class UserManagement
 	private boolean success = false;
 
 	/**
-	 * Receives from other java classes
+	 * Sets customers return application 
 	 */
-	private String customerAPI = "empty";
+	private String customerAPI="empty";
 
 	/** 
 	 * Receives commands from command line
 	 * @param args
 	 */
 	public UserManagement(String[] args) {
-		System.out.println(command(Arrays.asList(args)));
+		List<String> cmd  = new ArrayList<String>(Arrays.asList(args));
+		
+		customerAPI = cmd.remove(0);
+		
+		//builds customer return command
+		while( cmd.size() > 1 &&
+				
+				( !cmd.get(0).equals("signin") 
+				&& !cmd.get(0).equals("signup") 
+				&& !cmd.get(0).equals("register") 
+				&& !cmd.get(0).equals("register") 
+				&& !cmd.get(0).equals("delete")
+				&& !cmd.get(0).equals("deleteuser") 
+				&& !cmd.get(0).equals("changepassword") 
+				&& !cmd.get(0).equals("resetpassword") 
+				&& !cmd.get(0).equals("changesecurityquestionandanswer")
+				&& !cmd.get(0).equals("changefullname")))
+		{
+			customerAPI = customerAPI +" " + cmd.remove(0);
+		}
+		
+		command(cmd);
 	}
 
 	/**
@@ -145,7 +167,7 @@ public class UserManagement
 
 		// executes shell command to send back information to customers
 		// application
-		// esc.executeCommand(customerAPI);
+		esc.executeCommand(customerAPI);
 
 	}
 
