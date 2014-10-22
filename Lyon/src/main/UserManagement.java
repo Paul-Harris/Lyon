@@ -87,7 +87,13 @@ public class UserManagement
 	}
 
 	public String command(ArrayList<String> args) {
-		String toDo = args.remove(0).toLowerCase();
+		String commandName = args.get(0).toLowerCase();
+
+		ArrayList<String> params = new ArrayList<String>(args);
+		// remove the command name from the parameters
+		params.remove(0);
+
+		// String toDo = params.remove(0).toLowerCase();
 
 		// success should always be false at the start of a new command
 		success = false;
@@ -98,29 +104,29 @@ public class UserManagement
 						: new Database();
 			}
 
-			switch (toDo) {
+			switch (commandName) {
 			case "signin":
-				signIn(args);
+				signIn(params);
 				break;
 			case "signup":
 			case "register":
-				signUp(args);
+				signUp(params);
 				break;
 			case "delete":
 			case "deleteuser":
-				delete(args);
+				delete(params);
 				break;
 			case "changepassword":
-				changePasswordWithOldPassword(args);
+				changePasswordWithOldPassword(params);
 				break;
 			case "resetpassword":
-				resetPasswordWithSecurityAnswer(args);
+				resetPasswordWithSecurityAnswer(params);
 				break;
 			case "changesecurityquestionandanswer":
-				changeSecurityQuestionAndAnswer(args);
+				changeSecurityQuestionAndAnswer(params);
 				break;
 			case "changefullname":
-				changeFullName(args);
+				changeFullName(params);
 				break;
 			default:
 				return "Invalid command. Type help for a list of possible commands.";
@@ -144,7 +150,7 @@ public class UserManagement
 			return "Incorrect security answer.";
 		}
 
-		return toDo + " completed successfully.";
+		return commandName + " completed successfully.";
 	}
 
 	public List<User> getUsers(String loginUserName, String loginPassword)
@@ -161,11 +167,11 @@ public class UserManagement
 		return database.getUsers();
 	}
 
-	private void delete(List<String> args) throws NoSuchUserException,
+	private void delete(List<String> params) throws NoSuchUserException,
 			DatabaseException, InsufficientRightsException,
 			IncorrectPasswordException {
-		String userName = args.get(0);
-		String password = args.get(1);
+		String userName = params.get(0);
+		String password = params.get(1);
 
 		if (!security.verifyAdminRole(userName)) {
 			return;
@@ -175,16 +181,16 @@ public class UserManagement
 			return;
 		}
 
-		database.deleteUser(args.get(0));
+		database.deleteUser(params.get(0));
 
 		success = true;
 	}
 
-	private void signIn(List<String> args) throws NoSuchUserException,
+	private void signIn(List<String> params) throws NoSuchUserException,
 			DatabaseException, IncorrectPasswordException {
 
-		String userName = args.get(0);
-		String password = args.get(1);
+		String userName = params.get(0);
+		String password = params.get(1);
 
 		if (!security.verifyPassword(userName, password)) {
 			return;
@@ -199,22 +205,21 @@ public class UserManagement
 
 	}
 
-	private void signUp(List<String> args) throws DatabaseException,
+	private void signUp(List<String> params) throws DatabaseException,
 			InvalidPasswordException {
 
-		
-		String userName = args.get(0);
+		String userName = params.get(0);
 		User user = new User(userName);
 
-		if (!validatePassword(args.get(1))) {
+		if (!validatePassword(params.get(1))) {
 			throw new InvalidPasswordException();
 		}
 
-		user.setPasswordHash(security.createHash(args.get(1)));
-		user.setFullName(args.get(2));
-		user.setSecurityQuestion(args.get(3));
-		user.setSecurityAnswer(args.get(4));
-		
+		user.setPasswordHash(security.createHash(params.get(1)));
+		user.setFullName(params.get(2));
+		user.setSecurityQuestion(params.get(3));
+		user.setSecurityAnswer(params.get(4));
+
 		// By default, the first user added will be an admin.
 		if (database.getUsers().size() == 0) {
 			user.setRole(Role.ADMIN);
@@ -266,12 +271,12 @@ public class UserManagement
 		return true;
 	}
 
-	private void resetPasswordWithSecurityAnswer(List<String> args)
+	private void resetPasswordWithSecurityAnswer(List<String> params)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException, IncorrectSecurityAnswerException {
-		String userName = args.get(0);
-		String securityAnswer = args.get(1);
-		String newPassword = args.get(2);
+		String userName = params.get(0);
+		String securityAnswer = params.get(1);
+		String newPassword = params.get(2);
 
 		if (!security.verifySecurityAnswer(userName, securityAnswer)) {
 			return;
@@ -280,12 +285,12 @@ public class UserManagement
 		changePassword(userName, newPassword);
 	}
 
-	private void changePasswordWithOldPassword(List<String> cmd)
+	private void changePasswordWithOldPassword(List<String> params)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException, IncorrectPasswordException {
-		String userName = cmd.get(0);
-		String oldPassword = cmd.get(1);
-		String newPassword = cmd.get(2);
+		String userName = params.get(0);
+		String oldPassword = params.get(1);
+		String newPassword = params.get(2);
 
 		if (!security.verifyPassword(userName, oldPassword)) {
 			return;
@@ -329,11 +334,11 @@ public class UserManagement
 				newSecurityAnswer);
 	}
 
-	private void changeFullName(List<String> args) throws DatabaseException,
+	private void changeFullName(List<String> params) throws DatabaseException,
 			NoSuchUserException, IncorrectPasswordException {
-		String userName = args.get(0);
-		String password = args.get(1);
-		String newFullName = args.get(2);
+		String userName = params.get(0);
+		String password = params.get(1);
+		String newFullName = params.get(2);
 
 		if (!security.verifyPassword(userName, password)) {
 			return;

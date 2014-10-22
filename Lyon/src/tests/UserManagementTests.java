@@ -69,36 +69,36 @@ public class UserManagementTests
 
 	}
 
-//	@Test
-//	public void testSignUpAndSignIn() {
-//		UserManagement um = new UserManagement();
-//
-//		um.useInMemoryTestDB(true);
-//
-//		// Sign up
-//		String[] args = new String[] {
-//				"signup", "username", "Password1", "full name", "securityQ",
-//				"securityA"
-//		};
-//		System.out
-//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-//		assertTrue(um.checkSuccess());
-//
-//		// Sign in with valid password
-//		args = new String[] {
-//				"signin", "username", "Password1"
-//		};
-//		System.out
-//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-//		assertTrue(um.checkSuccess());
-//
-//		// Sign in with invalid password
-//		args = new String[] {
-//				"signin", "username", "Passwodr1"
-//		};
-//		System.out
-//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-//		assertFalse(um.checkSuccess());
-//
-//	}
+	@Test
+	public void testSignUpAndSignIn() {
+		UserManagement um = new UserManagement();
+
+		um.useInMemoryTestDB(true);
+
+		// Sign up
+		String[] args = new String[] {
+				"signup", "username", "Password1", "full name", "securityQ",
+				"securityA"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+		// Sign in with valid password
+		args = new String[] {
+				"signin", "username", "Password1"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+		// Sign in with invalid password
+		args = new String[] {
+				"signin", "username", "Passwodr1"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertFalse(um.checkSuccess());
+
+	}
 }
