@@ -5,7 +5,7 @@ public class User
 	private String userName, passwordHash, fullName, securityQuestion,
 			securityAnswer;
 
-	private Role role;
+	private Role role = Role.USER;
 
 	public enum Role {
 		USER, ADMIN

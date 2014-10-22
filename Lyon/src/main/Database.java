@@ -26,6 +26,9 @@ public class Database
 		initialize(DEFAULT_DB_FILE);
 	}
 
+	/**
+	 * Use null to create an in-memory database. (as per SQLite)
+	 */
 	public Database(File databaseFile) throws DatabaseException {
 		initialize(databaseFile);
 	}

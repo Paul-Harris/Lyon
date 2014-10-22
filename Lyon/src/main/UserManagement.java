@@ -28,38 +28,42 @@ public class UserManagement
 	private boolean success = false;
 
 	/**
-	 * Sets customers return application 
+	 * Sets customers return application
 	 */
-	private String customerAPI="empty";
+	private String customerAPI = "empty";
 
-	/** 
+	/**
 	 * Receives commands from command line
+	 * 
 	 * @param args
 	 */
 	public UserManagement(String[] args) {
-		List<String> cmd  = new ArrayList<String>(Arrays.asList(args));
-		
-		//Initializes customerAPI for command line
+		ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(args));
+
+		// Initializes customerAPI for command line
 		customerAPI = cmd.remove(0);
-		
-		//builds customer return command by concatenating any additaion commands or flags for customer
-		while( cmd.size() > 1 &&
-				
-				(  !cmd.get(0).equals("signin") 
-				&& !cmd.get(0).equals("signup") 
-				&& !cmd.get(0).equals("register") 
-				&& !cmd.get(0).equals("register") 
-				&& !cmd.get(0).equals("delete")
-				&& !cmd.get(0).equals("deleteuser") 
-				&& !cmd.get(0).equals("changepassword") 
-				&& !cmd.get(0).equals("resetpassword") 
-				&& !cmd.get(0).equals("changesecurityquestionandanswer")
-				&& !cmd.get(0).equals("changefullname")))
-		{
-			
-			customerAPI = customerAPI +" " + cmd.remove(0);
+
+		// builds customer return command by concatenating any additaion
+		// commands or flags for customer
+		while (cmd.size() > 1
+				&&
+
+				(!cmd.get(0).equals("signin")
+						&& !cmd.get(0).equals("signup")
+						&& !cmd.get(0).equals("register")
+						&& !cmd.get(0).equals("register")
+						&& !cmd.get(0).equals("delete")
+						&& !cmd.get(0).equals("deleteuser")
+						&& !cmd.get(0).equals("changepassword")
+						&& !cmd.get(0).equals("resetpassword")
+						&& !cmd.get(0)
+								.equals("changesecurityquestionandanswer") && !cmd
+						.get(0).equals("changefullname"))) {
+
+			customerAPI = customerAPI + " " + cmd.remove(0);
 		}
-		//Once the password command is found the remaining arguments are passed into Lyon to be processed
+		// Once the password command is found the remaining arguments are passed
+		// into Lyon to be processed
 		command(cmd);
 	}
 
@@ -68,24 +72,35 @@ public class UserManagement
 	 */
 	public UserManagement() {
 	}
-	
-	/** 
+
+	/**
 	 * Receives commands from Java API
+	 * 
 	 * @param args
 	 */
-	public UserManagement(List<String> args) {
+	public UserManagement(ArrayList<String> args) {
 		// TODO: Send back command output message to caller
 		// OR allow UserManagement class to be created without arguments
 		command(args);
 	}
 
-	public String command(List<String> args) {
+	public String command(ArrayList<String> args) {
+		return command(args, false);
+	}
+
+	public String command(ArrayList<String> args, boolean inMemoryDB) {
 		String toDo = args.remove(0);
 
 		toDo = toDo.toLowerCase();
 
 		try {
-			this.database = new Database();
+			if (this.database == null) {
+				if (inMemoryDB) {
+					this.database = new Database(null);
+				} else {
+					this.database = new Database();
+				}
+			}
 
 			switch (toDo) {
 			case "signin":
@@ -117,7 +132,7 @@ public class UserManagement
 
 		} catch (DatabaseException e) {
 			return "An error occured in the database: " + e.getMessage();
-			
+
 		} catch (NoSuchUserException e) {
 			return "User " + e.getUserName() + " does not exist.";
 
@@ -167,9 +182,10 @@ public class UserManagement
 
 		success = true;
 
+		// TODO: Get this working this if there is time.
 		// executes shell command to send back information to customers
 		// application
-		esc.executeCommand(customerAPI);
+		// esc.executeCommand(customerAPI);
 
 	}
 
@@ -189,7 +205,12 @@ public class UserManagement
 		user.setSecurityAnswer(args.get(4));
 
 		database.addUser(user);
-		esc.executeCommand(customerAPI);
+
+		// if no exception was thrown by the database
+		success = true;
+
+		// TODO: Fix this if there is time.
+		// esc.executeCommand(customerAPI);
 	}
 
 	public static boolean validatePassword(String password) {
