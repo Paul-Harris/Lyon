@@ -153,6 +153,10 @@ public class UserManagement
 		return commandName + " completed successfully.";
 	}
 
+	/**
+	 * Returns a list of all users in the database, given a username and
+	 * password belonging to an administrator
+	 */
 	public List<User> getUsers(String loginUserName, String loginPassword)
 			throws NoSuchUserException, DatabaseException,
 			IncorrectPasswordException, InsufficientRightsException {
@@ -165,6 +169,29 @@ public class UserManagement
 		}
 
 		return database.getUsers();
+	}
+
+	/**
+	 * Returns a User object when given a correct username and password password
+	 * belonging to an administrator
+	 */
+	public User getUser(String userName, String password)
+			throws NoSuchUserException, DatabaseException,
+			IncorrectPasswordException, InsufficientRightsException {
+
+		if (!security.verifyPassword(userName, password)) {
+			return null;
+		}
+
+		return database.getUser(userName);
+	}
+
+	/**
+	 * Tells whether a given user is an admin
+	 */
+	public boolean isAdmin(String userName) throws NoSuchUserException,
+			DatabaseException {
+		return database.getRole(userName).equals(Role.ADMIN);
 	}
 
 	private void delete(List<String> params) throws NoSuchUserException,
