@@ -20,7 +20,7 @@ import main.User.Role;
 public class UserManagement
 {
 
-	private Database db;
+	private Database database;
 	private SecurityHandler security = new SecurityHandler();
 	private ExecuteShellComand esc = new ExecuteShellComand();
 
@@ -47,7 +47,7 @@ public class UserManagement
 		toDo = toDo.toLowerCase();
 
 		try {
-			this.db = new Database();
+			this.database = new Database();
 
 			switch (toDo) {
 			case "signin":
@@ -105,7 +105,7 @@ public class UserManagement
 			return;
 		}
 
-		db.deleteUser(args.get(0));
+		database.deleteUser(args.get(0));
 
 		success = true;
 	}
@@ -143,13 +143,44 @@ public class UserManagement
 		user.setSecurityQuestion(args.get(3));
 		user.setSecurityAnswer(args.get(4));
 
-		db.addUser(user);
+		database.addUser(user);
 	}
 
-	private boolean validatePassword(String password) {
+	public static boolean validatePassword(String password) {
+		// Passwords must be 8-10 characters in length
+		if (password == null || password.length() < 8 || password.length() > 10) {
+			return false;
+		}
 
-		// TODO Auto-generated method stub
-		return false;
+		// They must have at least one digit and at least one capital letter
+		// They can only have digits, letters, and these symbols: ! & * ?
+		boolean hasCapitalLetter = false;
+		boolean hasDigit = false;
+		boolean allCharactersValid = true;
+		for (Character c : password.toCharArray()) {
+			if (Character.isUpperCase(c)) {
+				hasCapitalLetter = true;
+			} else if (Character.isDigit(c)) {
+				hasDigit = true;
+			} else if (Character.isLowerCase(c)) {
+				// Lowercase characters are okay.
+			} else if (c == '!' || c == '&' || c == '*' || c == '?') {
+				// These symbols are okay.
+			} else {
+				// Invalid character found.
+				allCharactersValid = false;
+			}
+		}
+
+		if (!allCharactersValid) {
+			return false;
+		}
+
+		if (!hasCapitalLetter || !hasDigit) {
+			return false;
+		}
+
+		return true;
 	}
 
 	public void changePasswordUsingSecurityAnswer(List<String> args)
@@ -159,7 +190,6 @@ public class UserManagement
 		String securityAnswer = args.get(1);
 		String newPassword = args.get(2);
 
-		// Make sure the security answer matches what is in the DB
 		if (!security.verifySecurityAnswer(userName, securityAnswer)) {
 			return;
 		}
@@ -172,7 +202,6 @@ public class UserManagement
 			InvalidPasswordException, IncorrectPasswordException {
 		String userName = cmd.get(0);
 		String oldPassword = cmd.get(1);
-
 		String newPassword = cmd.get(2);
 
 		if (!security.verifyPassword(userName, oldPassword)) {
@@ -193,10 +222,10 @@ public class UserManagement
 
 		String hashedNewPassword = security.createHash(newPassword);
 
-		db.changePassword(userName, hashedNewPassword);
+		database.changePassword(userName, hashedNewPassword);
 
 		// Verify the password was successfully changed
-		if (db.getPassword(userName).equals(hashedNewPassword)) {
+		if (database.getPassword(userName).equals(hashedNewPassword)) {
 			success = true;
 		}
 	}
@@ -271,7 +300,7 @@ public class UserManagement
 		public boolean verifySecurityAnswer(String userName,
 				String securityAnswer) throws IncorrectSecurityAnswerException,
 				NoSuchUserException, DatabaseException {
-			if (!securityAnswer.equals(db.getSecurityAnswer(userName))) {
+			if (!securityAnswer.equals(database.getSecurityAnswer(userName))) {
 				throw new IncorrectSecurityAnswerException();
 			} else {
 				return true;
@@ -281,7 +310,8 @@ public class UserManagement
 		public boolean verifyPassword(String userName, String unhashedPassword)
 				throws NoSuchUserException, DatabaseException,
 				IncorrectPasswordException {
-			if (!db.getPassword(userName).equals(createHash(unhashedPassword))) {
+			if (!database.getPassword(userName).equals(
+					createHash(unhashedPassword))) {
 				throw new IncorrectPasswordException();
 			} else {
 				return true;
@@ -291,7 +321,7 @@ public class UserManagement
 		public boolean verifyAdminRole(String userName)
 				throws InsufficientRightsException, NoSuchUserException,
 				DatabaseException {
-			if (!db.getRole(userName).equals(Role.ADMIN)) {
+			if (!database.getRole(userName).equals(Role.ADMIN)) {
 				throw new InsufficientRightsException();
 			} else {
 				return true;
