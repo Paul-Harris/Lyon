@@ -375,9 +375,4 @@ public class Database
 			+ FIELD_SECURITY_QUESTION + ", " + FIELD_SECURITY_ANSWER + ", "
 			+ FIELD_ROLE;
 
-	public String getLastError() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

@@ -77,11 +77,12 @@ public class UserManagement
 				return "Invalid command. Type help for a list of possible commands.";
 			}
 
+		} catch (DatabaseException e) {
+			return "An error occured in the database: " + e.getMessage();
+			
 		} catch (NoSuchUserException e) {
 			return "User " + e.getUserName() + " does not exist.";
 
-		} catch (DatabaseException e) {
-			return "An error occured in the database: " + e.getMessage();
 		} catch (InvalidPasswordException e) {
 			return "Invalid password. Passwords must be 8-10 characters in length.\n"
 					+ "They must have at least one digit and at least one capital letter.\n"
