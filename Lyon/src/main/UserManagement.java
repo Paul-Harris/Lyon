@@ -9,6 +9,7 @@ import java.util.List;
 
 import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
+import main.User.Role;
 
 /**
  * @author The Bomb Squad
@@ -20,7 +21,7 @@ public class UserManagement
 {
 
 	private Database db;
-	private PasswordSecurity ps = new PasswordSecurity();
+	private SecurityHandler security = new SecurityHandler();
 	private ExecuteShellComand esc = new ExecuteShellComand();
 
 	private boolean success = false;
@@ -69,6 +70,7 @@ public class UserManagement
 			default:
 				return "Invalid command. Type help for a list of possible commands.";
 			}
+
 		} catch (NoSuchUserException e) {
 			return "User " + e.getUserName() + " does not exist.";
 
@@ -78,32 +80,47 @@ public class UserManagement
 			return "Invalid password. Passwords must be 8-10 characters in length.\n"
 					+ "They must have at least one digit and at least one capital letter.\n"
 					+ "They can only have digits, letters, and these symbols: ! & * ?";
+		} catch (InsufficientRightsException e) {
+			return "That operation requires you to be an administrator.";
+		} catch (IncorrectPasswordException e) {
+			return "Incorrect password.";
+		} catch (IncorrectSecurityAnswerException e) {
+			return "Incorrect security answer.";
 		}
 
 		return toDo + " completed successfully.";
 	}
 
 	public void delete(List<String> args) throws NoSuchUserException,
-			DatabaseException {
-		String adminUsername = args.get(0);
-		String adminPasswordHashed = ps.createHash(args.get(1));
+			DatabaseException, InsufficientRightsException,
+			IncorrectPasswordException {
+		String userName = args.get(0);
+		String password = args.get(1);
 
-		// An exception will be thrown if this fails
+		if (!security.verifyAdminRole(userName)) {
+			return;
+		}
+
+		if (!security.verifyPassword(userName, password)) {
+			return;
+		}
+
 		db.deleteUser(args.get(0));
 
 		success = true;
 	}
 
 	public void signIn(List<String> args) throws NoSuchUserException,
-			DatabaseException {
+			DatabaseException, IncorrectPasswordException {
 
 		String userName = args.get(0);
-		String hashedPassword = args.get(1);
-		if (ps.verifyPassword(userName, hashedPassword)) {
-			success = true;
-		} else {
-			// TODO Display message if error occurred
+		String password = args.get(1);
+
+		if (!security.verifyPassword(userName, password)) {
+			return;
 		}
+
+		success = true;
 
 		// executes shell command to send back information to customers
 		// application
@@ -121,10 +138,10 @@ public class UserManagement
 			throw new InvalidPasswordException();
 		}
 
-		user.setPasswordHash(ps.createHash(args.get(1)));
+		user.setPasswordHash(security.createHash(args.get(1)));
 		user.setFullName(args.get(2));
 		user.setSecurityQuestion(args.get(3));
-		user.setSecurityAnswer(args.get(4)); // TODO: Hash security answer?
+		user.setSecurityAnswer(args.get(4));
 
 		db.addUser(user);
 	}
@@ -137,44 +154,48 @@ public class UserManagement
 
 	public void changePasswordUsingSecurityAnswer(List<String> args)
 			throws NoSuchUserException, DatabaseException,
-			InvalidPasswordException {
+			InvalidPasswordException, IncorrectSecurityAnswerException {
 		String userName = args.get(0);
 		String securityAnswer = args.get(1);
 		String newPassword = args.get(2);
 
 		// Make sure the security answer matches what is in the DB
-		if (securityAnswer.equals(db.getSecurityAnswer(userName))) {
-			changePassword(userName, newPassword);
+		if (!security.verifySecurityAnswer(userName, securityAnswer)) {
+			return;
 		}
+
+		changePassword(userName, newPassword);
 	}
 
 	public void changePasswordUsingOldPassword(List<String> cmd)
 			throws NoSuchUserException, DatabaseException,
-			InvalidPasswordException {
+			InvalidPasswordException, IncorrectPasswordException {
 		String userName = cmd.get(0);
-		String hashedOldPassword = ps.createHash(cmd.get(1));
+		String oldPassword = cmd.get(1);
 
 		String newPassword = cmd.get(2);
 
-		if (hashedOldPassword.equals(db.getPassword(userName))) {
-			changePassword(userName, newPassword);
+		if (!security.verifyPassword(userName, oldPassword)) {
+			return;
 		}
 
+		changePassword(userName, newPassword);
 	}
 
 	private void changePassword(String userName, String newPassword)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException {
 
+		// Make sure the password is valid
 		if (!validatePassword(newPassword)) {
 			throw new InvalidPasswordException();
 		}
 
-		String hashedNewPassword = ps.createHash(newPassword);
+		String hashedNewPassword = security.createHash(newPassword);
 
 		db.changePassword(userName, hashedNewPassword);
 
-		// Verify the password was succcesfully changed
+		// Verify the password was successfully changed
 		if (db.getPassword(userName).equals(hashedNewPassword)) {
 			success = true;
 		}
@@ -182,6 +203,15 @@ public class UserManagement
 
 	public boolean checkSuccess() {
 		return success;
+	}
+
+	/**
+	 * Used to display an error when a user tries to perform an
+	 * administrator-only operation
+	 */
+	public class InsufficientRightsException extends Exception
+	{
+		private static final long serialVersionUID = 2171510130999870636L;
 	}
 
 	/**
@@ -195,7 +225,7 @@ public class UserManagement
 	}
 
 	/**
-	 * Used to display an error when the password doesn't match the username.
+	 * Used to display an error when the wrong password is specified
 	 */
 	public class IncorrectPasswordException extends Exception
 	{
@@ -203,7 +233,15 @@ public class UserManagement
 
 	}
 
-	private class PasswordSecurity
+	/**
+	 * Used to display an error when the wrong security answer is specified
+	 */
+	public class IncorrectSecurityAnswerException extends Exception
+	{
+		private static final long serialVersionUID = 8723806537728501163L;
+	}
+
+	private class SecurityHandler
 	{
 		public String createHash(String password) {
 
@@ -230,9 +268,34 @@ public class UserManagement
 
 		}
 
-		public boolean verifyPassword(String userName, String password)
-				throws NoSuchUserException, DatabaseException {
-			return db.getPassword(userName).equals(createHash(password));
+		public boolean verifySecurityAnswer(String userName,
+				String securityAnswer) throws IncorrectSecurityAnswerException,
+				NoSuchUserException, DatabaseException {
+			if (!securityAnswer.equals(db.getSecurityAnswer(userName))) {
+				throw new IncorrectSecurityAnswerException();
+			} else {
+				return true;
+			}
+		}
+
+		public boolean verifyPassword(String userName, String unhashedPassword)
+				throws NoSuchUserException, DatabaseException,
+				IncorrectPasswordException {
+			if (!db.getPassword(userName).equals(createHash(unhashedPassword))) {
+				throw new IncorrectPasswordException();
+			} else {
+				return true;
+			}
+		}
+
+		public boolean verifyAdminRole(String userName)
+				throws InsufficientRightsException, NoSuchUserException,
+				DatabaseException {
+			if (!db.getRole(userName).equals(Role.ADMIN)) {
+				throw new InsufficientRightsException();
+			} else {
+				return true;
+			}
 		}
 
 	}
