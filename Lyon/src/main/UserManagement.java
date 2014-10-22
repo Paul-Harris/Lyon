@@ -87,11 +87,9 @@ public class UserManagement
 	}
 
 	public String command(ArrayList<String> args) {
-		String toDo = args.remove(0);
+		String toDo = args.remove(0).toLowerCase();
 
-		toDo = toDo.toLowerCase();
-		
-		// Always reset success after a command.
+		// success should always be false at the start of a new command
 		success = false;
 
 		try {
@@ -147,6 +145,20 @@ public class UserManagement
 		}
 
 		return toDo + " completed successfully.";
+	}
+
+	public List<User> getUsers(String loginUserName, String loginPassword)
+			throws NoSuchUserException, DatabaseException,
+			IncorrectPasswordException, InsufficientRightsException {
+
+		if (!security.verifyAdminRole(loginUserName)) {
+			return new ArrayList<User>();
+		}
+		if (!security.verifyPassword(loginUserName, loginPassword)) {
+			return new ArrayList<User>();
+		}
+
+		return database.getUsers();
 	}
 
 	private void delete(List<String> args) throws NoSuchUserException,
