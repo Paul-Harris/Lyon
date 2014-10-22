@@ -62,10 +62,16 @@ public class UserManagement
 				delete(args);
 				break;
 			case "changepassword":
-				changePasswordUsingOldPassword(args);
+				changePasswordWithOldPassword(args);
 				break;
 			case "resetpassword":
-				changePasswordUsingSecurityAnswer(args);
+				resetPasswordWithSecurityAnswer(args);
+				break;
+			case "changesecurityquestionandanswer":
+				changeSecurityQuestionAndAnswer(args);
+				break;
+			case "changefullname":
+				changeFullName(args);
 				break;
 			default:
 				return "Invalid command. Type help for a list of possible commands.";
@@ -91,7 +97,17 @@ public class UserManagement
 		return toDo + " completed successfully.";
 	}
 
-	public void delete(List<String> args) throws NoSuchUserException,
+	private void changeSecurityQuestionAndAnswer(List<String> args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void changeFullName(List<String> args) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void delete(List<String> args) throws NoSuchUserException,
 			DatabaseException, InsufficientRightsException,
 			IncorrectPasswordException {
 		String userName = args.get(0);
@@ -110,7 +126,7 @@ public class UserManagement
 		success = true;
 	}
 
-	public void signIn(List<String> args) throws NoSuchUserException,
+	private void signIn(List<String> args) throws NoSuchUserException,
 			DatabaseException, IncorrectPasswordException {
 
 		String userName = args.get(0);
@@ -128,7 +144,7 @@ public class UserManagement
 
 	}
 
-	public void signUp(List<String> args) throws DatabaseException,
+	private void signUp(List<String> args) throws DatabaseException,
 			InvalidPasswordException {
 
 		String userName = args.get(0);
@@ -183,7 +199,7 @@ public class UserManagement
 		return true;
 	}
 
-	public void changePasswordUsingSecurityAnswer(List<String> args)
+	private void resetPasswordWithSecurityAnswer(List<String> args)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException, IncorrectSecurityAnswerException {
 		String userName = args.get(0);
@@ -197,7 +213,7 @@ public class UserManagement
 		changePassword(userName, newPassword);
 	}
 
-	public void changePasswordUsingOldPassword(List<String> cmd)
+	private void changePasswordWithOldPassword(List<String> cmd)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException, IncorrectPasswordException {
 		String userName = cmd.get(0);
@@ -250,7 +266,6 @@ public class UserManagement
 	public class InvalidPasswordException extends Exception
 	{
 		private static final long serialVersionUID = 8723806537728501163L;
-
 	}
 
 	/**
@@ -258,8 +273,7 @@ public class UserManagement
 	 */
 	public class IncorrectPasswordException extends Exception
 	{
-		private static final long serialVersionUID = 8723806537728501163L;
-
+		private static final long serialVersionUID = 6920171054845730558L;
 	}
 
 	/**
@@ -267,7 +281,7 @@ public class UserManagement
 	 */
 	public class IncorrectSecurityAnswerException extends Exception
 	{
-		private static final long serialVersionUID = 8723806537728501163L;
+		private static final long serialVersionUID = 825562424873839368L;
 	}
 
 	private class SecurityHandler
