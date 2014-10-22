@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import main.Database;
+import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
 import main.User;
 import main.User.Role;
@@ -15,14 +16,14 @@ import org.junit.Test;
 public class DatabaseTests
 {
 	@Test
-	public void testDatabaseConnection() {
+	public void testDatabaseConnection() throws DatabaseException {
 		Database db = new Database();
 
 		assertTrue(db.isConnected());
 	}
 
 	@Test
-	public void testAddUserAndGetUsers() {
+	public void testAddUserAndGetUsers() throws DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -41,7 +42,7 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddUserAndGetUser() {
+	public void testAddUserAndGetUser() throws DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -65,7 +66,7 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddAndDeleteOneUser() {
+	public void testAddAndDeleteOneUser() throws DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -88,7 +89,7 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddThreeUsersAndDeleteTwo() {
+	public void testAddThreeUsersAndDeleteTwo() throws DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -124,7 +125,7 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testUserExists() {
+	public void testUserExists() throws DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -137,7 +138,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testPasswordMatches() {
+	public void testPasswordMatches() throws NoSuchUserException,
+			DatabaseException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -145,23 +147,16 @@ public class DatabaseTests
 
 		db.addUser(testUser);
 
-		try {
-			assertEquals(db.getPassword(testUser.getUserName()),
-					testUser.getPasswordHash());
-		} catch (NoSuchUserException e) {
-			fail();
-		}
+		assertEquals(db.getPassword(testUser.getUserName()),
+				testUser.getPasswordHash());
 
-		try {
-			assertNotEquals(db.getPassword(testUser.getUserName()),
-					testUser.getPasswordHash() + "0");
-		} catch (NoSuchUserException e) {
-			fail();
-		}
+		assertNotEquals(db.getPassword(testUser.getUserName()),
+				testUser.getPasswordHash() + "0");
 	}
 
 	@Test
-	public void testChangePassword() {
+	public void testChangePassword() throws DatabaseException,
+			NoSuchUserException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -174,17 +169,13 @@ public class DatabaseTests
 		db.changePassword(testUser.getUserName(), testUser.getPasswordHash());
 
 		User userInDB = null;
-		try {
-			userInDB = db.getUser(testUser.getUserName());
-		} catch (NoSuchUserException e) {
-			fail();
-		}
+		userInDB = db.getUser(testUser.getUserName());
 
 		assertUserFieldsEqual(testUser, userInDB);
 	}
 
 	@Test
-	public void testChangeSecurityQuestionAndAnswer() {
+	public void testChangeSecurityQuestionAndAnswer() throws DatabaseException, NoSuchUserException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 

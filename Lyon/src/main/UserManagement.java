@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
+import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
 import main.User.Role;
 
@@ -18,7 +19,7 @@ import main.User.Role;
 
 public class UserManagement
 {
-	private Database db = new Database();
+	private Database db;
 	private PasswordSecurity ps = new PasswordSecurity();
 	private ExecuteShellComand esc = new ExecuteShellComand();
 
@@ -35,6 +36,7 @@ public class UserManagement
 
 	// Receives commands from command line
 	public UserManagement(String[] args) {
+
 		this.command(Arrays.asList(args));
 	}
 
@@ -44,8 +46,11 @@ public class UserManagement
 	}
 
 	public void command(List<String> args) {
-		String toDo = args.remove(0);
 		try {
+			this.db = new Database();
+
+			String toDo = args.remove(0);
+
 			switch (toDo) {
 			case "signin":
 				signIn(args);
@@ -69,6 +74,8 @@ public class UserManagement
 		} catch (NoSuchUserException e) {
 			outputMessage = "User " + e.getUserName() + " does not exist.";
 
+		} catch (DatabaseException e) {
+			outputMessage = "An error occured in the database: " + e.getMessage();
 		}
 	}
 
@@ -87,7 +94,7 @@ public class UserManagement
 	//
 	// }
 
-	public void delete(List<String> args) throws NoSuchUserException {
+	public void delete(List<String> args) throws NoSuchUserException, DatabaseException {
 		// TODO: Require admin credentials
 
 		// TODO Display message if error occurred
@@ -99,7 +106,7 @@ public class UserManagement
 		}
 	}
 
-	public void signIn(List<String> args) throws NoSuchUserException {
+	public void signIn(List<String> args) throws NoSuchUserException, DatabaseException {
 
 		String userName = args.get(0);
 		String hashedPassword = args.get(1);
@@ -115,7 +122,7 @@ public class UserManagement
 
 	}
 
-	public void signUp(List<String> args) {
+	public void signUp(List<String> args) throws DatabaseException {
 
 		String userName = args.get(0);
 		User user = new User(userName);
@@ -133,12 +140,7 @@ public class UserManagement
 		user.setSecurityQuestion(args.get(3));
 		user.setSecurityAnswer(args.get(4)); // TODO: Hash security answer?
 
-		success = db.addUser(user);
-
-		if (!success) {
-			outputMessage = "Failed to add user to the database. Error was "
-					+ db.getLastError();
-		}
+		db.addUser(user);
 	}
 
 	private boolean validatePassword(String password) {
@@ -148,7 +150,7 @@ public class UserManagement
 	}
 
 	public void changePasswordUsingSecurityAnswer(List<String> args)
-			throws NoSuchUserException {
+			throws NoSuchUserException, DatabaseException {
 		String userName = args.get(0);
 		String securityAnswer = args.get(1);
 		String newPassword = args.get(2);
@@ -160,7 +162,7 @@ public class UserManagement
 	}
 
 	public void changePasswordUsingOldPassword(List<String> cmd)
-			throws NoSuchUserException {
+			throws NoSuchUserException, DatabaseException {
 		String userName = cmd.get(0);
 		String hashedOldPassword = ps.createHash(cmd.get(1));
 
@@ -173,7 +175,7 @@ public class UserManagement
 	}
 
 	private void changePassword(String userName, String newPassword)
-			throws NoSuchUserException {
+			throws NoSuchUserException, DatabaseException {
 
 		// Validate that the new password meets password requirements
 		if (!validatePassword(newPassword)) {
@@ -224,7 +226,7 @@ public class UserManagement
 		}
 
 		public boolean verifyPassword(String userName, String password)
-				throws NoSuchUserException {
+				throws NoSuchUserException, DatabaseException {
 			return db.getPassword(userName).equals(createHash(password));
 		}
 

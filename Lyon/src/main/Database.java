@@ -21,19 +21,21 @@ import com.almworks.sqlite4java.SQLiteStatement;
 
 public class Database
 {
-	public Database() {
+
+	public Database() throws DatabaseException {
 		initialize(DEFAULT_DB_FILE);
 	}
 
-	public Database(File databaseFile) {
+	public Database(File databaseFile) throws DatabaseException {
 		initialize(databaseFile);
 	}
 
-	public List<User> getUsers() {
+	public List<User> getUsers() throws DatabaseException {
 		return getUsers(null);
 	}
 
-	public User getUser(String userName) throws NoSuchUserException {
+	public User getUser(String userName) throws NoSuchUserException,
+			DatabaseException {
 		List<User> users = getUsers(userName);
 
 		if (users.isEmpty()) {
@@ -43,7 +45,7 @@ public class Database
 		return users.get(0);
 	}
 
-	public boolean userExists(String userName) {
+	public boolean userExists(String userName) throws DatabaseException {
 		String userNameInDB = null;
 		try {
 			userNameInDB = getUserData(userName, FIELD_USERNAME);
@@ -59,7 +61,7 @@ public class Database
 	 * 
 	 * @return true if user added successfully
 	 */
-	public boolean addUser(User user) {
+	public void addUser(User user) throws DatabaseException {
 		String sql = "INSERT INTO " + TABLE_USER + " (" + CSV_USER_TABLE_FIELDS
 				+ ")  values (?, ?, ?, ?, ?, ?);";
 
@@ -75,13 +77,10 @@ public class Database
 			statement.bind(6, user.getRole().toString());
 
 			exec(statement);
-			return true;
 		} catch (SQLiteException e) {
-			showError(e, "Could not add user " + user.getUserName()
-					+ " to the database.");
-			return false;
+			throw new DatabaseException(e.getMessage());
 		} finally {
-			disposeIfNotNull(statement);
+			disposeStatementIfNotNull(statement);
 		}
 	}
 
@@ -89,7 +88,8 @@ public class Database
 	 * 
 	 * @return True if user removed successfully
 	 */
-	public boolean deleteUser(String userName) throws NoSuchUserException {
+	public boolean deleteUser(String userName) throws NoSuchUserException,
+			DatabaseException {
 		if (!userExists(userName)) {
 			throw new NoSuchUserException(userName);
 		}
@@ -105,88 +105,64 @@ public class Database
 			exec(statement);
 			return true;
 		} catch (SQLiteException e) {
-			showError(e, "Could not remove user " + userName);
-			return false;
+			throw new DatabaseException(e.getMessage());
 		} finally {
-			disposeIfNotNull(statement);
+			disposeStatementIfNotNull(statement);
 		}
 	}
 
 	public String getSecurityQuestion(String userName)
-			throws NoSuchUserException {
+			throws NoSuchUserException, DatabaseException {
 		return getUserData(userName, FIELD_SECURITY_QUESTION);
 	}
 
-	public String getSecurityAnswer(String userName) throws NoSuchUserException {
+	public String getSecurityAnswer(String userName)
+			throws NoSuchUserException, DatabaseException {
 		return getUserData(userName, FIELD_SECURITY_ANSWER);
 	}
 
-	/**
-	 * 
-	 * @param userName
-	 * @return The hashed password
-	 * @throws NoSuchUserException
-	 */
-	public String getPassword(String userName) throws NoSuchUserException {
+	public String getPassword(String userName) throws NoSuchUserException,
+			DatabaseException {
 		return getUserData(userName, FIELD_PASSWORD);
 	}
 
-	public String getRole(String userName) throws NoSuchUserException {
+	public String getRole(String userName) throws NoSuchUserException,
+			DatabaseException {
 		return getUserData(userName, FIELD_ROLE);
 	}
 
-	public String getFullName(String userName) throws NoSuchUserException {
+	public String getFullName(String userName) throws NoSuchUserException,
+			DatabaseException {
 		return getUserData(userName, FIELD_FULLNAME);
 	}
 
-	/**
-	 * 
-	 * @param userName
-	 * @param newPassword
-	 *            The new hashed password
-	 * @return True if password change successful
-	 */
-	public boolean changePassword(String userName, String newPassword) {
-		return changeUserData(userName, FIELD_PASSWORD, newPassword);
+	public void changePassword(String userName, String newPassword)
+			throws DatabaseException, NoSuchUserException {
+		changeUserData(userName, FIELD_PASSWORD, newPassword);
 	}
 
-	/**
-	 * 
-	 * @param userName
-	 * @param newFullName
-	 * @return True if name change successful
-	 */
-	public boolean changeFullName(String userName, String newFullName) {
-		return changeUserData(userName, FIELD_FULLNAME, newFullName);
+	public void changeFullName(String userName, String newFullName)
+			throws DatabaseException, NoSuchUserException {
+		changeUserData(userName, FIELD_FULLNAME, newFullName);
 	}
 
-	/**
-	 * 
-	 * @param userName
-	 * @param newSecurityQuestion
-	 * @param newSecurityAnswer
-	 * @return True if security question and answer were successfully changed
-	 */
-	public boolean changeSecurityQuestionAndAnswer(String userName,
-			String newSecurityQuestion, String newSecurityAnswer) {
+	public void changeSecurityQuestionAndAnswer(String userName,
+			String newSecurityQuestion, String newSecurityAnswer)
+			throws DatabaseException, NoSuchUserException {
 
-		if (changeSecurityQuestion(userName, newSecurityQuestion)) {
-			return changeSecurityAnswer(userName, newSecurityAnswer);
-		}
-
-		return false;
+		changeSecurityQuestion(userName, newSecurityQuestion);
+		changeSecurityAnswer(userName, newSecurityAnswer);
 	}
 
-	private boolean changeSecurityQuestion(String userName,
-			String newSecurityQuestion) {
-		return changeUserData(userName, FIELD_SECURITY_QUESTION,
-				newSecurityQuestion);
+	private void changeSecurityQuestion(String userName,
+			String newSecurityQuestion) throws DatabaseException,
+			NoSuchUserException {
+		changeUserData(userName, FIELD_SECURITY_QUESTION, newSecurityQuestion);
 	}
 
-	private boolean changeSecurityAnswer(String userName,
-			String newSecurityAnswer) {
-		return changeUserData(userName, FIELD_SECURITY_ANSWER,
-				newSecurityAnswer);
+	private void changeSecurityAnswer(String userName, String newSecurityAnswer)
+			throws DatabaseException, NoSuchUserException {
+		changeUserData(userName, FIELD_SECURITY_ANSWER, newSecurityAnswer);
 	}
 
 	public boolean isConnected() {
@@ -198,6 +174,20 @@ public class Database
 	 */
 	public void dispose() {
 		dbConnection.dispose();
+	}
+
+	public class DatabaseException extends Exception
+	{
+		private static final long serialVersionUID = 7020222729193699736L;
+		private String message;
+
+		public DatabaseException(String message) {
+			this.message = message;
+		}
+
+		public String getMessage() {
+			return message;
+		}
 	}
 
 	public class NoSuchUserException extends Exception
@@ -214,26 +204,27 @@ public class Database
 		}
 	}
 
-	private void initialize(File dbFile) {
+	private void initialize(File dbFile) throws DatabaseException {
 		connect(dbFile);
 		createTableIfNotExisting(TABLE_USER, SCHEMA_USER_TABLE);
 	}
 
-	private void connect(File dbFile) {
+	private void connect(File dbFile) throws DatabaseException {
 		dbConnection = new SQLiteConnection(dbFile);
 		try {
 			dbConnection.open(true);
 		} catch (SQLiteException e) {
-			showError(e, "Could not connect to database.");
+			throw new DatabaseException(e.getMessage());
 		}
 	}
 
-	private void createTableIfNotExisting(String tableName, String schema) {
+	private void createTableIfNotExisting(String tableName, String schema)
+			throws DatabaseException {
 		try {
 			dbConnection.exec("CREATE TABLE IF NOT EXISTS " + tableName + " ("
 					+ schema + ")");
 		} catch (SQLiteException e) {
-			showError(e, "Could not create table " + tableName);
+			throw new DatabaseException(e.getMessage());
 		}
 	}
 
@@ -244,8 +235,9 @@ public class Database
 	 *            UserName of the user to be retrieved. Use null to get all
 	 *            users.
 	 * @return List of Users
+	 * @throws DatabaseException
 	 */
-	private List<User> getUsers(String userName) {
+	private List<User> getUsers(String userName) throws DatabaseException {
 		List<User> users = new ArrayList<User>();
 
 		String sql = "SELECT " + CSV_USER_TABLE_FIELDS + " FROM " + TABLE_USER;
@@ -279,14 +271,14 @@ public class Database
 
 			statement.dispose();
 		} catch (SQLiteException e) {
-			showError(e, "Failed to get users. SQL used was\n" + sql);
+			throw new DatabaseException(e.getMessage());
 		}
 
 		return users;
 	}
 
 	private String getUserData(String userName, String fieldName)
-			throws NoSuchUserException {
+			throws NoSuchUserException, DatabaseException {
 		SQLiteStatement statement = null;
 
 		String sql = "SELECT " + fieldName + " FROM " + TABLE_USER + " WHERE "
@@ -302,17 +294,19 @@ public class Database
 			}
 			throw new NoSuchUserException(userName);
 		} catch (SQLiteException e) {
-			showError(e, "Error getting " + fieldName + " for user " + userName
-					+ ".\nSQL Used was: " + sql);
-			return null;
+			throw new DatabaseException(e.getMessage());
 		} finally {
-			disposeIfNotNull(statement);
+			disposeStatementIfNotNull(statement);
 		}
 	}
 
 	private boolean changeUserData(String userName, String fieldName,
-			String newValue) {
+			String newValue) throws DatabaseException, NoSuchUserException {
 		SQLiteStatement statement = null;
+
+		if (!userExists(userName)) {
+			throw new NoSuchUserException(userName);
+		}
 
 		String sql = "UPDATE " + TABLE_USER + " SET " + fieldName
 				+ " = ? WHERE " + FIELD_USERNAME + " = ?;";
@@ -327,20 +321,13 @@ public class Database
 			}
 			return true;
 		} catch (SQLiteException e) {
-			showError(e, "Error changing " + fieldName + " to " + newValue
-					+ " for user " + userName + ".\nSQL Used was: " + sql);
-			return false;
+			throw new DatabaseException(e.getMessage());
 		} finally {
-			disposeIfNotNull(statement);
+			disposeStatementIfNotNull(statement);
 		}
 	}
 
-	private void showError(Exception e, String message) {
-		System.err.println(message);
-		e.printStackTrace();
-	}
-
-	private void disposeIfNotNull(SQLiteStatement statement) {
+	private void disposeStatementIfNotNull(SQLiteStatement statement) {
 		if (statement != null) {
 			statement.dispose();
 		}
