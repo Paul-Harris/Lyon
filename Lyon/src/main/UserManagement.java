@@ -25,6 +25,8 @@ public class UserManagement
 	private SecurityHandler security = new SecurityHandler();
 	private ExecuteShellComand esc = new ExecuteShellComand();
 
+	private boolean useInMemoryTestDB = false;
+
 	private boolean success = false;
 
 	/**
@@ -85,21 +87,17 @@ public class UserManagement
 	}
 
 	public String command(ArrayList<String> args) {
-		return command(args, false);
-	}
-
-	public String command(ArrayList<String> args, boolean inMemoryDB) {
 		String toDo = args.remove(0);
 
 		toDo = toDo.toLowerCase();
+		
+		// Always reset success after a command.
+		success = false;
 
 		try {
 			if (this.database == null) {
-				if (inMemoryDB) {
-					this.database = new Database(null);
-				} else {
-					this.database = new Database();
-				}
+				this.database = useInMemoryTestDB ? new Database(null)
+						: new Database();
 			}
 
 			switch (toDo) {
@@ -452,6 +450,10 @@ public class UserManagement
 
 		}
 
+	}
+
+	public void useInMemoryTestDB(boolean value) {
+		useInMemoryTestDB = value;
 	}
 
 }

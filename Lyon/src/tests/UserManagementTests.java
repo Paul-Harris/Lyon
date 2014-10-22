@@ -1,13 +1,12 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import main.User;
 import main.UserManagement;
-import main.UserManagement.InvalidPasswordException;
 
 import org.junit.Test;
 
@@ -35,24 +34,61 @@ public class UserManagementTests
 	@Test
 	public void testSignUp() {
 		UserManagement um = new UserManagement();
-		
+
+		um.useInMemoryTestDB(true);
+
 		assertFalse(um.checkSuccess());
 
 		String[] signUpArgs = new String[] {
 				"signup", "username", "password", "full name", "securityQ",
 				"securityA"
 		};
-		System.out.println(um.command(
-				new ArrayList<String>(Arrays.asList(signUpArgs)), true));
+		System.out.println(um.command(new ArrayList<String>(Arrays
+				.asList(signUpArgs))));
 		assertFalse(um.checkSuccess());
 
 		signUpArgs = new String[] {
 				"signup", "username", "Password1", "full name", "securityQ",
 				"securityA"
 		};
-		System.out.println(um.command(
-				new ArrayList<String>(Arrays.asList(signUpArgs)), true));
+		System.out.println(um.command(new ArrayList<String>(Arrays
+				.asList(signUpArgs))));
 		assertTrue(um.checkSuccess());
+
+	}
+
+	@Test
+	public void testSignUpAndSignIn() {
+		UserManagement um = new UserManagement();
+
+		um.useInMemoryTestDB(true);
+
+		
+		// Sign up
+		String[] args = new String[] {
+				"signup", "username", "Password1", "full name", "securityQ",
+				"securityA"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+		// Sign in with valid password
+		args = new String[] {
+				"signin", "username", "Password1"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+		
+		// Sign in with invalid password
+		args = new String[] {
+				"signin", "username", "Passwodr1"
+		};
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertFalse(um.checkSuccess());
+		
 
 	}
 }
