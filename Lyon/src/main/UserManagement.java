@@ -26,15 +26,29 @@ public class UserManagement
 
 	private boolean success = false;
 
-	// Receives from other java classes
+	/**
+	 * Receives from other java classes
+	 */
 	private String customerAPI = "empty";
 
-	// Receives commands from command line
+	/** 
+	 * Receives commands from command line
+	 * @param args
+	 */
 	public UserManagement(String[] args) {
 		System.out.println(command(Arrays.asList(args)));
 	}
 
-	// Receives commands from Java API
+	/**
+	 * Creates a new UserManagement object without invoking a command.
+	 */
+	public UserManagement() {
+	}
+	
+	/** 
+	 * Receives commands from Java API
+	 * @param args
+	 */
 	public UserManagement(List<String> args) {
 		// TODO: Send back command output message to caller
 		// OR allow UserManagement class to be created without arguments
