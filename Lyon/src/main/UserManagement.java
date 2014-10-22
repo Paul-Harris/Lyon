@@ -9,7 +9,6 @@ import java.util.List;
 
 import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
-import main.User.Role;
 
 /**
  * @author The Bomb Squad
@@ -19,94 +18,84 @@ import main.User.Role;
 
 public class UserManagement
 {
+
 	private Database db;
 	private PasswordSecurity ps = new PasswordSecurity();
 	private ExecuteShellComand esc = new ExecuteShellComand();
 
 	private boolean success = false;
-	private String outputMessage = "";
-
-	private final String MESSAGE_PASSWORD_REQUIREMENTS = /**/
-	"Passwords must be 8-10 characters in length.\n"
-			+ "They must have at least one digit and at least one capital letter.\n"
-			+ "They allow only digits, letters, and these symbols: ! & * ?";
 
 	// Receives from other java classes
 	private String customerAPI = "empty";
 
 	// Receives commands from command line
 	public UserManagement(String[] args) {
-
-		this.command(Arrays.asList(args));
+		System.out.println(command(Arrays.asList(args)));
 	}
 
 	// Receives commands from Java API
 	public UserManagement(List<String> args) {
+		// TODO: Send back command output message to caller
+		// OR allow UserManagement class to be created without arguments
 		command(args);
 	}
 
-	public void command(List<String> args) {
+	public String command(List<String> args) {
+		String toDo = args.remove(0);
+
+		toDo = toDo.toLowerCase();
+
 		try {
 			this.db = new Database();
-
-			String toDo = args.remove(0);
 
 			switch (toDo) {
 			case "signin":
 				signIn(args);
 				break;
 			case "signup":
+			case "register":
 				signUp(args);
 				break;
-			case "resetpassword":
-				changePasswordUsingSecurityAnswer(args);
-				break;
 			case "delete":
+			case "deleteuser":
 				delete(args);
 				break;
 			case "changepassword":
 				changePasswordUsingOldPassword(args);
 				break;
-			default:
-				outputMessage = "Invalid command. Type help for a list of possible commands.";
+			case "resetpassword":
+				changePasswordUsingSecurityAnswer(args);
 				break;
+			default:
+				return "Invalid command. Type help for a list of possible commands.";
 			}
 		} catch (NoSuchUserException e) {
-			outputMessage = "User " + e.getUserName() + " does not exist.";
+			return "User " + e.getUserName() + " does not exist.";
 
 		} catch (DatabaseException e) {
-			outputMessage = "An error occured in the database: " + e.getMessage();
+			return "An error occured in the database: " + e.getMessage();
+		} catch (InvalidPasswordException e) {
+			return "Invalid password. Passwords must be 8-10 characters in length.\n"
+					+ "They must have at least one digit and at least one capital letter.\n"
+					+ "They can only have digits, letters, and these symbols: ! & * ?";
 		}
+
+		return toDo + " completed successfully.";
 	}
 
-	// private void changeInfo(List<String> args) throws NoSuchUserException {
-	// String affectedUserName = args.get(0);
-	//
-	// String loginUserName = args.get(1);
-	// String loginPassword = args.get(2);
-	//
-	// if (!affectedUserName.equals(loginUserName)) {
-	// if (db.getRole(loginUserName).equals(Role.USER.toString())) {
-	//
-	// }
-	// }
-	// // TODO Auto-generated method stub
-	//
-	// }
+	public void delete(List<String> args) throws NoSuchUserException,
+			DatabaseException {
+		String adminUsername = args.get(0);
+		String adminPasswordHashed = ps.createHash(args.get(1));
 
-	public void delete(List<String> args) throws NoSuchUserException, DatabaseException {
-		// TODO: Require admin credentials
+		// An exception will be thrown if this fails
+		db.deleteUser(args.get(0));
 
-		// TODO Display message if error occurred
-		if (db.deleteUser(args.get(0))) {
-			success = true;
-		} else {
-			outputMessage = "Could not delete user. Error was "
-					+ db.getLastError();
-		}
+		success = true;
 	}
 
-	public void signIn(List<String> args) throws NoSuchUserException, DatabaseException {
+	public void signIn(List<String> args) throws NoSuchUserException,
+			DatabaseException {
 
 		String userName = args.get(0);
 		String hashedPassword = args.get(1);
@@ -122,17 +111,14 @@ public class UserManagement
 
 	}
 
-	public void signUp(List<String> args) throws DatabaseException {
+	public void signUp(List<String> args) throws DatabaseException,
+			InvalidPasswordException {
 
 		String userName = args.get(0);
 		User user = new User(userName);
 
-		// Validate that the password meets password requirements
 		if (!validatePassword(args.get(1))) {
-
-			outputMessage = "Could not register user. "
-					+ MESSAGE_PASSWORD_REQUIREMENTS;
-			return;
+			throw new InvalidPasswordException();
 		}
 
 		user.setPasswordHash(ps.createHash(args.get(1)));
@@ -150,7 +136,8 @@ public class UserManagement
 	}
 
 	public void changePasswordUsingSecurityAnswer(List<String> args)
-			throws NoSuchUserException, DatabaseException {
+			throws NoSuchUserException, DatabaseException,
+			InvalidPasswordException {
 		String userName = args.get(0);
 		String securityAnswer = args.get(1);
 		String newPassword = args.get(2);
@@ -162,7 +149,8 @@ public class UserManagement
 	}
 
 	public void changePasswordUsingOldPassword(List<String> cmd)
-			throws NoSuchUserException, DatabaseException {
+			throws NoSuchUserException, DatabaseException,
+			InvalidPasswordException {
 		String userName = cmd.get(0);
 		String hashedOldPassword = ps.createHash(cmd.get(1));
 
@@ -175,13 +163,11 @@ public class UserManagement
 	}
 
 	private void changePassword(String userName, String newPassword)
-			throws NoSuchUserException, DatabaseException {
+			throws NoSuchUserException, DatabaseException,
+			InvalidPasswordException {
 
-		// Validate that the new password meets password requirements
 		if (!validatePassword(newPassword)) {
-			outputMessage = "Could not change password. "
-					+ MESSAGE_PASSWORD_REQUIREMENTS;
-			return;
+			throw new InvalidPasswordException();
 		}
 
 		String hashedNewPassword = ps.createHash(newPassword);
@@ -196,6 +182,12 @@ public class UserManagement
 
 	public boolean checkSuccess() {
 		return success;
+	}
+
+	public class InvalidPasswordException extends Exception
+	{
+		private static final long serialVersionUID = 8723806537728501163L;
+
 	}
 
 	private class PasswordSecurity

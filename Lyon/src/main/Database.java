@@ -88,7 +88,7 @@ public class Database
 	 * 
 	 * @return True if user removed successfully
 	 */
-	public boolean deleteUser(String userName) throws NoSuchUserException,
+	public void deleteUser(String userName) throws NoSuchUserException,
 			DatabaseException {
 		if (!userExists(userName)) {
 			throw new NoSuchUserException(userName);
@@ -103,7 +103,6 @@ public class Database
 			statement.bind(1, userName);
 
 			exec(statement);
-			return true;
 		} catch (SQLiteException e) {
 			throw new DatabaseException(e.getMessage());
 		} finally {
