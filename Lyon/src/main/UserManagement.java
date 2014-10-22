@@ -97,16 +97,6 @@ public class UserManagement
 		return toDo + " completed successfully.";
 	}
 
-	private void changeSecurityQuestionAndAnswer(List<String> args) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void changeFullName(List<String> args) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	private void delete(List<String> args) throws NoSuchUserException,
 			DatabaseException, InsufficientRightsException,
 			IncorrectPasswordException {
@@ -244,6 +234,35 @@ public class UserManagement
 		if (database.getPassword(userName).equals(hashedNewPassword)) {
 			success = true;
 		}
+	}
+
+	private void changeSecurityQuestionAndAnswer(List<String> args)
+			throws DatabaseException, NoSuchUserException,
+			IncorrectPasswordException {
+		String userName = args.get(0);
+		String password = args.get(1);
+		String newSecurityQuestion = args.get(2);
+		String newSecurityAnswer = args.get(3);
+
+		if (!security.verifyPassword(userName, password)) {
+			return;
+		}
+
+		database.changeSecurityQuestionAndAnswer(userName, newSecurityQuestion,
+				newSecurityAnswer);
+	}
+
+	private void changeFullName(List<String> args) throws DatabaseException,
+			NoSuchUserException, IncorrectPasswordException {
+		String userName = args.get(0);
+		String password = args.get(1);
+		String newFullName = args.get(2);
+
+		if (!security.verifyPassword(userName, password)) {
+			return;
+		}
+
+		database.changeFullName(userName, newFullName);
 	}
 
 	public boolean checkSuccess() {
