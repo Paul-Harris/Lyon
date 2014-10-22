@@ -46,6 +46,8 @@ public class UserManagementTests
 		System.out.println(um.command(new ArrayList<String>(Arrays
 				.asList(signUpArgs))));
 		assertFalse(um.checkSuccess());
+		
+		
 
 		signUpArgs = new String[] {
 				"signup", "username", "Password1", "full name", "securityQ",

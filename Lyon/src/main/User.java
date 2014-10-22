@@ -59,4 +59,10 @@ public class User
 		this.role = role;
 	}
 
+	@Override
+	public String toString() {
+		return userName + "\t" + fullName + "\t" + role.toString();
+
+	}
+
 }
