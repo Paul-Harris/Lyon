@@ -5,8 +5,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import main.Database.DatabaseException;
+import main.Database.NoSuchUserException;
+import main.User;
 import main.UserManagement;
+import main.UserManagement.IncorrectPasswordException;
+import main.UserManagement.InsufficientRightsException;
 
 import org.junit.Test;
 
@@ -32,7 +38,7 @@ public class UserManagementTests
 	}
 
 	@Test
-	public void testSignUp() {
+	public void testSignUp() throws NoSuchUserException, DatabaseException, IncorrectPasswordException, InsufficientRightsException {
 		UserManagement um = new UserManagement();
 
 		um.useInMemoryTestDB(true);
@@ -46,8 +52,6 @@ public class UserManagementTests
 		System.out.println(um.command(new ArrayList<String>(Arrays
 				.asList(signUpArgs))));
 		assertFalse(um.checkSuccess());
-		
-		
 
 		signUpArgs = new String[] {
 				"signup", "username", "Password1", "full name", "securityQ",
@@ -56,41 +60,45 @@ public class UserManagementTests
 		System.out.println(um.command(new ArrayList<String>(Arrays
 				.asList(signUpArgs))));
 		assertTrue(um.checkSuccess());
+		
+		List<User> users = um.getUsers("username", "Password1");
+		
+		for (User user : users) {
+			System.out.println(user);
+		}
 
 	}
 
-	@Test
-	public void testSignUpAndSignIn() {
-		UserManagement um = new UserManagement();
-
-		um.useInMemoryTestDB(true);
-
-		
-		// Sign up
-		String[] args = new String[] {
-				"signup", "username", "Password1", "full name", "securityQ",
-				"securityA"
-		};
-		System.out
-				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-		assertTrue(um.checkSuccess());
-
-		// Sign in with valid password
-		args = new String[] {
-				"signin", "username", "Password1"
-		};
-		System.out
-				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-		assertTrue(um.checkSuccess());
-		
-		// Sign in with invalid password
-		args = new String[] {
-				"signin", "username", "Passwodr1"
-		};
-		System.out
-				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
-		assertFalse(um.checkSuccess());
-		
-
-	}
+//	@Test
+//	public void testSignUpAndSignIn() {
+//		UserManagement um = new UserManagement();
+//
+//		um.useInMemoryTestDB(true);
+//
+//		// Sign up
+//		String[] args = new String[] {
+//				"signup", "username", "Password1", "full name", "securityQ",
+//				"securityA"
+//		};
+//		System.out
+//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+//		assertTrue(um.checkSuccess());
+//
+//		// Sign in with valid password
+//		args = new String[] {
+//				"signin", "username", "Password1"
+//		};
+//		System.out
+//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+//		assertTrue(um.checkSuccess());
+//
+//		// Sign in with invalid password
+//		args = new String[] {
+//				"signin", "username", "Passwodr1"
+//		};
+//		System.out
+//				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+//		assertFalse(um.checkSuccess());
+//
+//	}
 }

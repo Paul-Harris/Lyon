@@ -202,6 +202,7 @@ public class UserManagement
 	private void signUp(List<String> args) throws DatabaseException,
 			InvalidPasswordException {
 
+		
 		String userName = args.get(0);
 		User user = new User(userName);
 
@@ -213,6 +214,11 @@ public class UserManagement
 		user.setFullName(args.get(2));
 		user.setSecurityQuestion(args.get(3));
 		user.setSecurityAnswer(args.get(4));
+		
+		// By default, the first user added will be an admin.
+		if (database.getUsers().size() == 0) {
+			user.setRole(Role.ADMIN);
+		}
 
 		database.addUser(user);
 
@@ -425,7 +431,7 @@ public class UserManagement
 		public boolean verifyAdminRole(String userName)
 				throws InsufficientRightsException, NoSuchUserException,
 				DatabaseException {
-			if (!database.getRole(userName).equals(Role.ADMIN)) {
+			if (!database.getRole(userName).equals(Role.ADMIN.toString())) {
 				throw new InsufficientRightsException();
 			} else {
 				return true;
