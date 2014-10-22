@@ -184,7 +184,20 @@ public class UserManagement
 		return success;
 	}
 
+	/**
+	 * Used to display an error when a password doesn't meet the requirements
+	 * for a password.
+	 */
 	public class InvalidPasswordException extends Exception
+	{
+		private static final long serialVersionUID = 8723806537728501163L;
+
+	}
+
+	/**
+	 * Used to display an error when the password doesn't match the username.
+	 */
+	public class IncorrectPasswordException extends Exception
 	{
 		private static final long serialVersionUID = 8723806537728501163L;
 

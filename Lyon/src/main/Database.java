@@ -175,6 +175,10 @@ public class Database
 		dbConnection.dispose();
 	}
 
+	/**
+	 * Used to communicate the occurence and details of a database error to
+	 * other classes.
+	 */
 	public class DatabaseException extends Exception
 	{
 		private static final long serialVersionUID = 7020222729193699736L;
@@ -189,6 +193,10 @@ public class Database
 		}
 	}
 
+	/**
+	 * Used to inform other classes that the user specified in an operation was
+	 * not found.
+	 */
 	public class NoSuchUserException extends Exception
 	{
 		private static final long serialVersionUID = 5654784800867083023L;
