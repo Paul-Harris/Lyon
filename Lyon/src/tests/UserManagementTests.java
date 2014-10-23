@@ -65,12 +65,6 @@ public class UserManagementTests
 				.asList(signUpArgs))));
 		assertTrue(um.checkSuccess());
 
-		List<User> users = um.getUsers("username", "Password1");
-
-		for (User user : users) {
-			System.out.println(user);
-		}
-
 	}
 
 	@Test
