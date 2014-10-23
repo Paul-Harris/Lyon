@@ -64,7 +64,12 @@ public class Database
 	 * 
 	 * @return true if user added successfully
 	 */
-	public void addUser(User user) throws DatabaseException {
+	public void addUser(User user) throws DatabaseException,
+			UserAlreadyExistsException {
+		if (userExists(user.getUserName())) {
+			throw new UserAlreadyExistsException(user.getUserName());
+		}
+		
 		String sql = "INSERT INTO " + TABLE_USER + " (" + CSV_USER_TABLE_FIELDS
 				+ ")  values (?, ?, ?, ?, ?, ?);";
 
@@ -206,6 +211,24 @@ public class Database
 		private String userName;
 
 		public NoSuchUserException(String username) {
+			this.userName = username;
+		}
+
+		public String getUserName() {
+			return userName;
+		}
+	}
+
+	/**
+	 * Used to inform other classes that a new user cannot be added with a
+	 * username that has already been choosen.
+	 */
+	public class UserAlreadyExistsException extends Exception
+	{
+		private static final long serialVersionUID = 9143393953207473115L;
+		private String userName;
+
+		public UserAlreadyExistsException(String username) {
 			this.userName = username;
 		}
 

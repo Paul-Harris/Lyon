@@ -8,6 +8,7 @@ import java.util.UUID;
 import main.Database;
 import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
+import main.Database.UserAlreadyExistsException;
 import main.User;
 import main.User.Role;
 
@@ -23,7 +24,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddUserAndGetUsers() throws DatabaseException {
+	public void testAddUserAndGetUsers() throws DatabaseException,
+			UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -42,7 +44,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddUserAndGetUser() throws DatabaseException {
+	public void testAddUserAndGetUser() throws DatabaseException,
+			UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -66,7 +69,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddAndDeleteOneUser() throws DatabaseException {
+	public void testAddAndDeleteOneUser() throws DatabaseException,
+			UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -89,7 +93,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testAddThreeUsersAndDeleteTwo() throws DatabaseException {
+	public void testAddThreeUsersAndDeleteTwo() throws DatabaseException,
+			UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -125,7 +130,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testUserExists() throws DatabaseException {
+	public void testUserExists() throws DatabaseException,
+			UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -139,7 +145,7 @@ public class DatabaseTests
 
 	@Test
 	public void testPasswordMatches() throws NoSuchUserException,
-			DatabaseException {
+			DatabaseException, UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -156,7 +162,7 @@ public class DatabaseTests
 
 	@Test
 	public void testChangePassword() throws DatabaseException,
-			NoSuchUserException {
+			NoSuchUserException, UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 
@@ -174,7 +180,8 @@ public class DatabaseTests
 	}
 
 	@Test
-	public void testChangeSecurityQuestionAndAnswer() throws DatabaseException, NoSuchUserException {
+	public void testChangeSecurityQuestionAndAnswer() throws DatabaseException,
+			NoSuchUserException, UserAlreadyExistsException {
 		// Create an in-memory test database
 		Database db = new Database(null);
 

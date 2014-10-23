@@ -10,6 +10,7 @@ import java.util.List;
 
 import main.Database.DatabaseException;
 import main.Database.NoSuchUserException;
+import main.Database.UserAlreadyExistsException;
 import main.User.Role;
 
 /**
@@ -96,7 +97,8 @@ public class UserManagement
 				changeFullName(params);
 				break;
 			default:
-				return "Invalid command. Type help for a list of possible commands.";
+				return "Invalid command + '" + commandName
+						+ "'. Type help for a list of possible commands.";
 			}
 
 		} catch (DatabaseException e) {
@@ -115,6 +117,9 @@ public class UserManagement
 			return "Incorrect password.";
 		} catch (IncorrectSecurityAnswerException e) {
 			return "Incorrect security answer.";
+		} catch (UserAlreadyExistsException e) {
+			return "The username " + e.getUserName()
+					+ " has already been used. Try a different one.";
 		}
 
 		return commandName + " completed successfully.";
@@ -200,7 +205,7 @@ public class UserManagement
 	}
 
 	private void signUp(List<String> params) throws DatabaseException,
-			InvalidPasswordException {
+			InvalidPasswordException, UserAlreadyExistsException {
 
 		String userName = params.get(0);
 		User user = new User(userName);
