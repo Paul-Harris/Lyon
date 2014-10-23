@@ -18,26 +18,22 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-public class GraphicalUserInterface {
+public class GraphicalUserInterface
+{
 
-	public static JFrame loginFrame = new JFrame("Password Manager");
-	public static JFrame registerFrame = new JFrame("Password Manager");
-	public static JFrame adminFrame = new JFrame("Password Manager");
-	public static JFrame editFrame = new JFrame("Password Manager");
-	public static JFrame forgotFrame = new JFrame("Password Manager");
+	public static JFrame loginFrame, registerFrame, adminFrame, editFrame,
+			forgotFrame;
 	static UserManagement um;
 	static ArrayList<String> cmd;
-	private static JTextField roleText;
 
 	public static void main(String[] args) {
 		loginFrame(true);
 	}
 
 	static void loginFrame(boolean visibility) {
-
+		loginFrame = new JFrame("Password Manager");
 		loginFrame.setSize(300, 200);
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		loginFrame.setVisible(visibility);
 
 		loginFrame.getContentPane().setLayout(null);
 
@@ -101,13 +97,15 @@ public class GraphicalUserInterface {
 				registerFrame(true);
 			}
 		});
+
+		loginFrame.setLocationRelativeTo(null); // center on screen
+		loginFrame.setVisible(visibility);
 	}
 
 	private static void registerFrame(boolean visibility) {
-
+		registerFrame = new JFrame("Password Manager");
 		registerFrame.setSize(350, 300);
 		registerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		registerFrame.setVisible(visibility);
 
 		registerFrame.getContentPane().setLayout(null);
 
@@ -192,13 +190,14 @@ public class GraphicalUserInterface {
 			}
 		});
 
+		registerFrame.setLocationRelativeTo(null); // center on screen
+		registerFrame.setVisible(visibility);
 	}
 
 	static void adminFrame(boolean visibility) {
-
+		adminFrame = new JFrame("Password Manager");
 		adminFrame.setSize(350, 150);
 		adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		adminFrame.setVisible(visibility);
 
 		adminFrame.getContentPane().setLayout(null);
 
@@ -238,13 +237,15 @@ public class GraphicalUserInterface {
 				// RUN DELETE
 			}
 		});
+
+		adminFrame.setLocationRelativeTo(null); // center on screen
+		adminFrame.setVisible(visibility);
 	}
 
 	static void editFrame(boolean visibility, String username, String password) {
-
+		editFrame = new JFrame("Password Manager");
 		editFrame.setSize(350, 200);
 		editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		editFrame.setVisible(visibility);
 
 		editFrame.getContentPane().setLayout(null);
 
@@ -294,13 +295,15 @@ public class GraphicalUserInterface {
 				editFrame.dispose();
 			}
 		});
+
+		editFrame.setLocationRelativeTo(null); // center on screen
+		editFrame.setVisible(visibility);
 	}
 
 	static void forgotFrame(boolean visibility) {
-
+		forgotFrame = new JFrame("Password Manager");
 		forgotFrame.setSize(350, 250);
 		forgotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		forgotFrame.setVisible(visibility);
 
 		forgotFrame.getContentPane().setLayout(null);
 
@@ -368,6 +371,9 @@ public class GraphicalUserInterface {
 				forgotFrame.dispose();
 			}
 		});
+
+		forgotFrame.setLocationRelativeTo(null); // center on screen
+		forgotFrame.setVisible(visibility);
 	}
 
 }
