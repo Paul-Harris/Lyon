@@ -168,8 +168,7 @@ public class DatabaseTests
 
 		db.changePassword(testUser.getUserName(), testUser.getPasswordHash());
 
-		User userInDB = null;
-		userInDB = db.getUser(testUser.getUserName());
+		User userInDB = db.getUser(testUser.getUserName());
 
 		assertUserFieldsEqual(testUser, userInDB);
 	}

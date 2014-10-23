@@ -16,21 +16,19 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 public class GraphicalUserInterface
 {
-
-	public static JFrame loginFrame, registerFrame, adminFrame, editFrame,
-			forgotFrame;
-	static UserManagement um;
-	static ArrayList<String> cmd;
+	private static JFrame loginFrame, registerFrame, forgotFrame;
+	private static UserManagement um = new UserManagement();
 
 	public static void main(String[] args) {
-		loginFrame(true);
+		displayLoginFrame(true);
 	}
 
-	static void loginFrame(boolean visibility) {
+	static void displayLoginFrame(boolean visibility) {
 		loginFrame = new JFrame("Password Manager");
 		loginFrame.setSize(300, 200);
 		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,7 +47,7 @@ public class GraphicalUserInterface
 		passwordLabel.setBounds(10, 40, 80, 25);
 		loginFrame.getContentPane().add(passwordLabel);
 
-		final JTextField passwordText = new JTextField(20);
+		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(100, 40, 160, 25);
 		loginFrame.getContentPane().add(passwordText);
 
@@ -68,23 +66,26 @@ public class GraphicalUserInterface
 		forgotButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				forgotFrame(true);
+				displayForgotFrame(true);
 			}
 		});
 
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				cmd = new ArrayList<String>(Arrays.asList("signin",
-						userText.getText(), passwordText.getText()));
-				um = new UserManagement();
+				ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(
+						"signin", userText.getText(),
+						String.valueOf(passwordText.getPassword())));
 				String message = um.command(cmd);
 
 				JButton source = (JButton) e.getSource();
 				if (um.checkSuccess() == true) {
 
 					JOptionPane.showMessageDialog(source, message);
-					registerFrame.dispose();
+
+					if (registerFrame != null) {
+						registerFrame.dispose();
+					}
 				} else
 					JOptionPane.showMessageDialog(source, message);
 
@@ -94,7 +95,7 @@ public class GraphicalUserInterface
 		registerButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				registerFrame(true);
+				displayRegisterFrame(true);
 			}
 		});
 
@@ -102,9 +103,9 @@ public class GraphicalUserInterface
 		loginFrame.setVisible(visibility);
 	}
 
-	private static void registerFrame(boolean visibility) {
+	private static void displayRegisterFrame(boolean visibility) {
 		registerFrame = new JFrame("Password Manager");
-		registerFrame.setSize(350, 300);
+		registerFrame.setSize(350, 250);
 		registerFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		registerFrame.getContentPane().setLayout(null);
@@ -123,7 +124,7 @@ public class GraphicalUserInterface
 		passwordLabel.setBounds(10, 40, 80, 25);
 		registerFrame.getContentPane().add(passwordLabel);
 
-		final JTextField passwordText = new JTextField(20);
+		final JPasswordField passwordText = new JPasswordField(20);
 		passwordText.setBounds(150, 40, 160, 25);
 		registerFrame.getContentPane().add(passwordText);
 
@@ -161,15 +162,21 @@ public class GraphicalUserInterface
 
 		registerButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				JButton source = (JButton) e.getSource();
 
-				cmd = new ArrayList<String>(Arrays.asList("register",
-						userNameText.getText(), passwordText.getText(),
+				if (userNameText.getText().trim().length() == 0) {
+					JOptionPane.showMessageDialog(source,
+							"Username cannot be blank.");
+					return;
+				}
+
+				ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(
+						"register", userNameText.getText(),
+						String.valueOf(passwordText.getPassword()),
 						nameText.getText(), questionText.getText(),
 						answerText.getText()));
-				um = new UserManagement();
 				String message = um.command(cmd);
 
-				JButton source = (JButton) e.getSource();
 				if (um.checkSuccess() == true) {
 
 					JOptionPane.showMessageDialog(source, message);
@@ -194,113 +201,7 @@ public class GraphicalUserInterface
 		registerFrame.setVisible(visibility);
 	}
 
-	static void adminFrame(boolean visibility) {
-		adminFrame = new JFrame("Password Manager");
-		adminFrame.setSize(350, 150);
-		adminFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		adminFrame.getContentPane().setLayout(null);
-
-		JLabel userLabel = new JLabel("User Name");
-		userLabel.setBounds(10, 10, 80, 25);
-		adminFrame.getContentPane().add(userLabel);
-
-		final JTextField userText = new JTextField(20);
-		userText.setBounds(150, 10, 160, 25);
-		adminFrame.getContentPane().add(userText);
-
-		JLabel pwLabel = new JLabel("User Password");
-		pwLabel.setBounds(10, 40, 100, 25);
-		adminFrame.getContentPane().add(pwLabel);
-
-		final JTextField pwText = new JTextField(20);
-		pwText.setBounds(150, 40, 160, 25);
-		adminFrame.getContentPane().add(pwText);
-
-		JButton editButton = new JButton("Edit");
-		editButton.setBounds(10, 80, 100, 25);
-		adminFrame.getContentPane().add(editButton);
-
-		JButton deleteButton = new JButton("Delete");
-		deleteButton.setBounds(160, 80, 100, 25);
-		adminFrame.getContentPane().add(deleteButton);
-
-		editButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				editFrame(true, userText.getText(), pwText.getText());
-			}
-		});
-
-		deleteButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// RUN DELETE
-			}
-		});
-
-		adminFrame.setLocationRelativeTo(null); // center on screen
-		adminFrame.setVisible(visibility);
-	}
-
-	static void editFrame(boolean visibility, String username, String password) {
-		editFrame = new JFrame("Password Manager");
-		editFrame.setSize(350, 200);
-		editFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		editFrame.getContentPane().setLayout(null);
-
-		JLabel userLabel = new JLabel("User Name");
-		userLabel.setBounds(10, 10, 80, 25);
-		editFrame.getContentPane().add(userLabel);
-
-		final JTextField userText = new JTextField(20);
-		userText.setBounds(150, 10, 160, 25);
-		userText.setText(username);
-		editFrame.getContentPane().add(userText);
-
-		JLabel pwLabel = new JLabel("Old Password");
-		pwLabel.setBounds(10, 40, 120, 25);
-		editFrame.getContentPane().add(pwLabel);
-
-		final JTextField pwText = new JTextField(20);
-		pwText.setBounds(150, 40, 160, 25);
-		pwText.setText(password);
-		editFrame.getContentPane().add(pwText);
-
-		JLabel newpwLabel = new JLabel("New Password");
-		newpwLabel.setBounds(10, 70, 120, 25);
-		editFrame.getContentPane().add(newpwLabel);
-
-		final JTextField newpwText = new JTextField(20);
-		newpwText.setBounds(150, 70, 160, 25);
-		editFrame.getContentPane().add(newpwText);
-
-		JButton saveButton = new JButton("Save");
-		saveButton.setBounds(10, 100, 100, 25);
-		editFrame.getContentPane().add(saveButton);
-
-		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setBounds(160, 100, 100, 25);
-		editFrame.getContentPane().add(cancelButton);
-
-		saveButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// ADD CHANGE PASSWORD WITH OLD PASSWORD
-			}
-		});
-
-		cancelButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				editFrame.dispose();
-			}
-		});
-
-		editFrame.setLocationRelativeTo(null); // center on screen
-		editFrame.setVisible(visibility);
-	}
-
-	static void forgotFrame(boolean visibility) {
+	static void displayForgotFrame(boolean visibility) {
 		forgotFrame = new JFrame("Password Manager");
 		forgotFrame.setSize(350, 250);
 		forgotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -335,7 +236,7 @@ public class GraphicalUserInterface
 		newpwLabel.setBounds(10, 120, 120, 25);
 		forgotFrame.getContentPane().add(newpwLabel);
 
-		final JTextField newpwText = new JTextField(20);
+		final JPasswordField newpwText = new JPasswordField(20);
 		newpwText.setBounds(150, 120, 160, 25);
 		forgotFrame.getContentPane().add(newpwText);
 
@@ -349,10 +250,10 @@ public class GraphicalUserInterface
 
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cmd = new ArrayList<String>(Arrays.asList("resetpassword",
-						userText.getText(), answerText.getText(),
-						newpwText.getText()));
-				um = new UserManagement();
+				ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(
+						"resetpassword", userText.getText(),
+						answerText.getText(),
+						String.valueOf(newpwText.getPassword())));
 				String message = um.command(cmd);
 
 				JButton source = (JButton) e.getSource();

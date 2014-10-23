@@ -19,7 +19,7 @@ public class run {
 		else
 		{
 			gui = new GraphicalUserInterface();
-			GraphicalUserInterface.loginFrame(true);
+			GraphicalUserInterface.displayLoginFrame(true);
 		}
 		
 

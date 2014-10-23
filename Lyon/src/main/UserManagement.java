@@ -42,30 +42,6 @@ public class UserManagement
 	public UserManagement(String[] args) {
 		ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(args));
 
-		// Initializes customerAPI for command line
-		customerAPI = cmd.remove(0);
-
-		// builds customer return command by concatenating any additaion
-		// commands or flags for customer
-		while (cmd.size() > 1
-				&&
-
-				(!cmd.get(0).equals("signin")
-						&& !cmd.get(0).equals("signup")
-						&& !cmd.get(0).equals("register")
-						&& !cmd.get(0).equals("register")
-						&& !cmd.get(0).equals("delete")
-						&& !cmd.get(0).equals("deleteuser")
-						&& !cmd.get(0).equals("changepassword")
-						&& !cmd.get(0).equals("resetpassword")
-						&& !cmd.get(0)
-								.equals("changesecurityquestionandanswer") && !cmd
-						.get(0).equals("changefullname"))) {
-
-			customerAPI = customerAPI + " " + cmd.remove(0);
-		}
-		// Once the password command is found the remaining arguments are passed
-		// into Lyon to be processed
 		command(cmd);
 	}
 
