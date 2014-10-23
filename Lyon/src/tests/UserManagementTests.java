@@ -93,4 +93,31 @@ public class UserManagementTests
 		assertFalse(um.checkSuccess());
 
 	}
+	
+	@Test
+	public void testSignUpAndPasswordReset() {
+		UserManagement um = new UserManagement();
+
+		um.useInMemoryTestDB(true);
+
+		// Sign up
+		String[] args = new String[] { "signup", "username", "Password1",
+				"full name", "securityQ", "securityA" };
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+		// Reset Password
+		args = new String[] { "resetpassword", "username", "securityA", "ChangedP0" };
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+		// Sign in with valid password
+		args = new String[] { "signin", "username", "ChangedP0" };
+		System.out
+				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
+		assertTrue(um.checkSuccess());
+
+	}
 }
