@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -10,7 +11,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 /**
  * GraphicalUserInterface is the graphical human usable interface for the Lyon
@@ -204,8 +207,8 @@ public class GraphicalUserInterface
 	}
 
 	static void displayForgotFrame(boolean visibility) {
-		forgotFrame = new JFrame("Password Manager");
-		forgotFrame.setSize(350, 250);
+		forgotFrame = new JFrame("Forgot Password");
+		forgotFrame.setSize(350, 260);
 		forgotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		forgotFrame.getContentPane().setLayout(null);
@@ -218,37 +221,64 @@ public class GraphicalUserInterface
 		userText.setBounds(150, 10, 160, 25);
 		forgotFrame.getContentPane().add(userText);
 
-		JLabel questionLabel = new JLabel("Security Question");
-		questionLabel.setBounds(10, 40, 120, 25);
-		forgotFrame.getContentPane().add(questionLabel);
+		JButton questionButton = new JButton("Show Question");
+		questionButton.setBounds(10, 40, 120, 25);
+		questionButton.setHorizontalAlignment(SwingConstants.LEFT);
+		forgotFrame.getContentPane().add(questionButton);
 
-		final JTextField questionText = new JTextField(20);
-		questionText.setBounds(150, 40, 160, 25);
+		final JTextArea questionText = new JTextArea();
+		questionText.setEditable(false);
+//		questionText.setEnabled(false);
+		questionText.setBorder(userText.getBorder());
+		questionText.setBounds(150, 40, 160, 60);
+		questionText.setForeground(Color.BLACK);
 		forgotFrame.getContentPane().add(questionText);
 
 		JLabel answerLabel = new JLabel("Security Answer");
-		answerLabel.setBounds(10, 80, 120, 25);
+		answerLabel.setBounds(10, 110, 120, 25);
 		forgotFrame.getContentPane().add(answerLabel);
 
 		final JTextField answerText = new JTextField(20);
-		answerText.setBounds(150, 80, 160, 25);
+		answerText.setBounds(150, 110, 160, 25);
 		forgotFrame.getContentPane().add(answerText);
 
 		JLabel newpwLabel = new JLabel("New Password");
-		newpwLabel.setBounds(10, 120, 120, 25);
+		newpwLabel.setBounds(10, 150, 120, 25);
 		forgotFrame.getContentPane().add(newpwLabel);
 
 		final JPasswordField newpwText = new JPasswordField(20);
-		newpwText.setBounds(150, 120, 160, 25);
+		newpwText.setBounds(150, 150, 160, 25);
 		forgotFrame.getContentPane().add(newpwText);
 
 		JButton saveButton = new JButton("Save");
-		saveButton.setBounds(10, 150, 100, 25);
+		saveButton.setBounds(10, 190, 100, 25);
 		forgotFrame.getContentPane().add(saveButton);
 
 		JButton cancelButton = new JButton("Cancel");
-		cancelButton.setBounds(160, 150, 100, 25);
+		cancelButton.setBounds(160, 190, 100, 25);
 		forgotFrame.getContentPane().add(cancelButton);
+
+		questionButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JButton source = (JButton) e.getSource();
+				if (userText.getText().trim().isEmpty()) {
+					JOptionPane.showMessageDialog(source,
+							"Please enter your username.");
+					return;
+				}
+
+				ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(
+						"showsecurityquestion", userText.getText()));
+
+				String message = userManagement.command(cmd);
+
+				if (userManagement.checkSuccess() == true) {
+					questionText.setText(message);
+				} else {
+					JOptionPane.showMessageDialog(source, message);
+				}
+			}
+		});
 
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -278,5 +308,4 @@ public class GraphicalUserInterface
 		forgotFrame.setLocationRelativeTo(null); // center on screen
 		forgotFrame.setVisible(visibility);
 	}
-
 }

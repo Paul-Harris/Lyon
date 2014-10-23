@@ -78,6 +78,7 @@ public class UserManagement
 				signIn(params);
 				break;
 			case "signup":
+			case "register":
 				signUp(params);
 				break;
 			case "resetpassword":
@@ -93,7 +94,7 @@ public class UserManagement
 						+ "resetpassword <userName> <securityAnswer> <newPassword>\n";
 
 			default:
-				return "Invalid command + '" + commandName
+				return "Invalid command '" + commandName
 						+ "'. Type help for a list of possible commands.";
 			}
 
@@ -243,6 +244,8 @@ public class UserManagement
 		String userName = params.get(0);
 
 		String securityQ = database.getSecurityQuestion(userName);
+
+		success = true;
 
 		return securityQ;
 	}
