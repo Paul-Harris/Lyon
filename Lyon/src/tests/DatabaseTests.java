@@ -14,6 +14,14 @@ import main.User.Role;
 
 import org.junit.Test;
 
+/**
+ * This class uses JUnit testing methods to test database functionality.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
+ */
 public class DatabaseTests
 {
 	@Test

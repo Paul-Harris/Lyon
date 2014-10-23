@@ -1,7 +1,5 @@
 package main;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -14,9 +12,15 @@ import main.Database.UserAlreadyExistsException;
 import main.User.Role;
 
 /**
- * @author The Bomb Squad
- * @version October 21, 2014
- * @purpose UserManagment is the controller of Lyon password management system.
+ * The UserManagement class is the controller component. It is used to
+ * communicate between the model and the view and determine, based on user input,
+ * what actions should be performed, how they should be performed, and how the
+ * results should be communicated back to the user.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
  */
 
 public class UserManagement
@@ -30,8 +34,6 @@ public class UserManagement
 
 	/**
 	 * Receives commands from command line
-	 * 
-	 * @param args
 	 */
 	public UserManagement(String[] args) {
 		ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(args));
@@ -47,8 +49,6 @@ public class UserManagement
 
 	/**
 	 * Receives commands from Java API
-	 * 
-	 * @param args
 	 */
 	public UserManagement(ArrayList<String> args) {
 		// TODO: Send back command output message to caller
@@ -228,9 +228,6 @@ public class UserManagement
 
 		// if no exception was thrown by the database
 		success = true;
-
-		// TODO: Fix this if there is time.
-		// esc.executeCommand(customerAPI);
 	}
 
 	public static boolean validatePassword(String password) {
@@ -403,7 +400,6 @@ public class UserManagement
 				// returns the hash of the password
 				hash = sb.toString();
 			} catch (NoSuchAlgorithmException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 

@@ -16,9 +16,16 @@ import main.UserManagement.InsufficientRightsException;
 
 import org.junit.Test;
 
+/**
+ * This class uses JUnit testing methods to test user management functionality.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
+ */
 public class UserManagementTests
 {
-
 	@Test
 	public void testPasswordValidation() {
 		assertTrue(UserManagement.validatePassword("Orange123"));
@@ -38,31 +45,28 @@ public class UserManagementTests
 	}
 
 	@Test
-	public void testSignUp() throws NoSuchUserException, DatabaseException, IncorrectPasswordException, InsufficientRightsException {
+	public void testSignUp() throws NoSuchUserException, DatabaseException,
+			IncorrectPasswordException, InsufficientRightsException {
 		UserManagement um = new UserManagement();
 
 		um.useInMemoryTestDB(true);
 
 		assertFalse(um.checkSuccess());
 
-		String[] signUpArgs = new String[] {
-				"signup", "username", "password", "full name", "securityQ",
-				"securityA"
-		};
+		String[] signUpArgs = new String[] { "signup", "username", "password",
+				"full name", "securityQ", "securityA" };
 		System.out.println(um.command(new ArrayList<String>(Arrays
 				.asList(signUpArgs))));
 		assertFalse(um.checkSuccess());
 
-		signUpArgs = new String[] {
-				"signup", "username", "Password1", "full name", "securityQ",
-				"securityA"
-		};
+		signUpArgs = new String[] { "signup", "username", "Password1",
+				"full name", "securityQ", "securityA" };
 		System.out.println(um.command(new ArrayList<String>(Arrays
 				.asList(signUpArgs))));
 		assertTrue(um.checkSuccess());
-		
+
 		List<User> users = um.getUsers("username", "Password1");
-		
+
 		for (User user : users) {
 			System.out.println(user);
 		}
@@ -76,26 +80,20 @@ public class UserManagementTests
 		um.useInMemoryTestDB(true);
 
 		// Sign up
-		String[] args = new String[] {
-				"signup", "username", "Password1", "full name", "securityQ",
-				"securityA"
-		};
+		String[] args = new String[] { "signup", "username", "Password1",
+				"full name", "securityQ", "securityA" };
 		System.out
 				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
 		assertTrue(um.checkSuccess());
 
 		// Sign in with valid password
-		args = new String[] {
-				"signin", "username", "Password1"
-		};
+		args = new String[] { "signin", "username", "Password1" };
 		System.out
 				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
 		assertTrue(um.checkSuccess());
 
 		// Sign in with invalid password
-		args = new String[] {
-				"signin", "username", "Passwodr1"
-		};
+		args = new String[] { "signin", "username", "Passwodr1" };
 		System.out
 				.println(um.command(new ArrayList<String>(Arrays.asList(args))));
 		assertFalse(um.checkSuccess());

@@ -1,5 +1,13 @@
 package main;
 
+/**
+ * This class encapsulates information to be stored about a user.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
+ */
 public class User
 {
 	private String userName, passwordHash, fullName, securityQuestion,
@@ -57,12 +65,6 @@ public class User
 
 	public void setRole(Role role) {
 		this.role = role;
-	}
-
-	@Override
-	public String toString() {
-		return userName + "\t" + fullName + "\t" + role.toString();
-
 	}
 
 }

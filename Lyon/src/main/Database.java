@@ -13,10 +13,12 @@ import com.almworks.sqlite4java.SQLiteException;
 import com.almworks.sqlite4java.SQLiteStatement;
 
 /**
- * @author The Bomb Squad
- * @version October 20, 2014
- * @purpose Database is the model of the Lyon password management system that
- *          connects to the SQLite database to push and retrive values.
+ * The Database class stores and retrieves user information using an SQLite database.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
  */
 
 public class Database
@@ -69,7 +71,7 @@ public class Database
 		if (userExists(user.getUserName())) {
 			throw new UserAlreadyExistsException(user.getUserName());
 		}
-		
+
 		String sql = "INSERT INTO " + TABLE_USER + " (" + CSV_USER_TABLE_FIELDS
 				+ ")  values (?, ?, ?, ?, ?, ?);";
 

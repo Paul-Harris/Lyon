@@ -1,12 +1,5 @@
 package main;
 
-/**
- * @author The Bomb Squad
- * Created : October 14, 2014
- * Purpose : GraphicalUserInterface is the graphical human usable interface to the Lyon password management system 
- * Interactions : 
- * 
- */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -19,10 +12,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
+/**
+ * GraphicalUserInterface is the graphical human usable interface for the Lyon
+ * password management system.
+ * 
+ * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
+ *         Harris, Tim Zorca)
+ * @version October 23, 2014
+ * 
+ */
 public class GraphicalUserInterface
 {
 	private static JFrame loginFrame, registerFrame, forgotFrame;
-	private static UserManagement um = new UserManagement();
+	private static UserManagement userManagement = new UserManagement();
 
 	public static void main(String[] args) {
 		displayLoginFrame(true);
@@ -76,10 +78,10 @@ public class GraphicalUserInterface
 				ArrayList<String> cmd = new ArrayList<String>(Arrays.asList(
 						"signin", userText.getText(),
 						String.valueOf(passwordText.getPassword())));
-				String message = um.command(cmd);
+				String message = userManagement.command(cmd);
 
 				JButton source = (JButton) e.getSource();
-				if (um.checkSuccess() == true) {
+				if (userManagement.checkSuccess() == true) {
 
 					JOptionPane.showMessageDialog(source, message);
 
@@ -175,9 +177,9 @@ public class GraphicalUserInterface
 						String.valueOf(passwordText.getPassword()),
 						nameText.getText(), questionText.getText(),
 						answerText.getText()));
-				String message = um.command(cmd);
+				String message = userManagement.command(cmd);
 
-				if (um.checkSuccess() == true) {
+				if (userManagement.checkSuccess() == true) {
 
 					JOptionPane.showMessageDialog(source, message);
 					registerFrame.dispose();
@@ -254,10 +256,10 @@ public class GraphicalUserInterface
 						"resetpassword", userText.getText(),
 						answerText.getText(),
 						String.valueOf(newpwText.getPassword())));
-				String message = um.command(cmd);
+				String message = userManagement.command(cmd);
 
 				JButton source = (JButton) e.getSource();
-				if (um.checkSuccess() == true) {
+				if (userManagement.checkSuccess() == true) {
 
 					JOptionPane.showMessageDialog(source, message);
 					forgotFrame.dispose();
