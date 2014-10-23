@@ -20,19 +20,12 @@ import main.User.Role;
 
 public class UserManagement
 {
-
 	private Database database;
 	private SecurityHandler security = new SecurityHandler();
-	private ExecuteShellComand esc = new ExecuteShellComand();
 
 	private boolean useInMemoryTestDB = false;
 
 	private boolean success = false;
-
-	/**
-	 * Sets customers return application
-	 */
-	private String customerAPI = "empty";
 
 	/**
 	 * Receives commands from command line
@@ -68,8 +61,6 @@ public class UserManagement
 		ArrayList<String> params = new ArrayList<String>(args);
 		// remove the command name from the parameters
 		params.remove(0);
-
-		// String toDo = params.remove(0).toLowerCase();
 
 		// success should always be false at the start of a new command
 		success = false;
@@ -444,36 +435,6 @@ public class UserManagement
 			} else {
 				return true;
 			}
-		}
-
-	}
-
-	// Sends responses to users custom program via shell
-	public class ExecuteShellComand
-	{
-
-		private String executeCommand(String command) {
-
-			StringBuffer output = new StringBuffer();
-
-			Process p;
-			try {
-				p = Runtime.getRuntime().exec(command);
-				p.waitFor();
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(p.getInputStream()));
-
-				String line = "";
-				while ((line = reader.readLine()) != null) {
-					output.append(line + "\n");
-				}
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			return output.toString();
-
 		}
 
 	}
