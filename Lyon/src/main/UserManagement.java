@@ -13,9 +13,9 @@ import main.User.Role;
 
 /**
  * The UserManagement class is the controller component. It is used to
- * communicate between the model and the view and determine, based on user input,
- * what actions should be performed, how they should be performed, and how the
- * results should be communicated back to the user.
+ * communicate between the model and the view and determine, based on user
+ * input, what actions should be performed, how they should be performed, and
+ * how the results should be communicated back to the user.
  * 
  * @author The Bomb Squad (Samantha Beaston, Jacob Coleman, Jin Cho, Austin
  *         Harris, Tim Zorca)
@@ -57,13 +57,14 @@ public class UserManagement
 	}
 
 	public String command(ArrayList<String> args) {
+		// Get just the command name
 		String commandName = args.get(0).toLowerCase();
 
+		// Get just the parameters
 		ArrayList<String> params = new ArrayList<String>(args);
-		// remove the command name from the parameters
 		params.remove(0);
 
-		// success should always be false at the start of a new command
+		// Success should always be false at the start of a new command.
 		success = false;
 
 		try {
@@ -196,12 +197,6 @@ public class UserManagement
 		}
 
 		success = true;
-
-		// TODO: Get this working this if there is time.
-		// executes shell command to send back information to customers
-		// application
-		// esc.executeCommand(customerAPI);
-
 	}
 
 	private void signUp(List<String> params) throws DatabaseException,
@@ -248,8 +243,10 @@ public class UserManagement
 				hasDigit = true;
 			} else if (Character.isLowerCase(c)) {
 				// Lowercase characters are okay.
+				continue;
 			} else if (c == '!' || c == '&' || c == '*' || c == '?') {
 				// These symbols are okay.
+				continue;
 			} else {
 				// Invalid character found.
 				allCharactersValid = false;
