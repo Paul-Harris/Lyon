@@ -78,25 +78,20 @@ public class UserManagement
 				signIn(params);
 				break;
 			case "signup":
-			case "register":
 				signUp(params);
-				break;
-			case "delete":
-			case "deleteuser":
-				delete(params);
-				break;
-			case "changepassword":
-				changePasswordWithOldPassword(params);
 				break;
 			case "resetpassword":
 				resetPasswordWithSecurityAnswer(params);
 				break;
-			case "changesecurityquestionandanswer":
-				changeSecurityQuestionAndAnswer(params);
-				break;
-			case "changefullname":
-				changeFullName(params);
-				break;
+			case "showsecurityquestion":
+				return showSecurityQuestion(params);
+			case "help":
+				return "Available commands are as follows:\n"
+						+ "signup <userName> <password> <fullName> <securityQuestion> <securityAnswer>\n"
+						+ "signin <userName> <password>\n"
+						+ "showsecurityanswer <userName>\n"
+						+ "resetpassword <userName> <securityAnswer> <newPassword>\n";
+
 			default:
 				return "Invalid command + '" + commandName
 						+ "'. Type help for a list of possible commands.";
@@ -112,8 +107,6 @@ public class UserManagement
 			return "Invalid password. Passwords must be 8-10 characters in length.\n"
 					+ "They must have at least one digit and at least one capital letter.\n"
 					+ "They can only have digits, letters, and these symbols: ! & * ?";
-		} catch (InsufficientRightsException e) {
-			return "That operation requires you to be an administrator.";
 		} catch (IncorrectPasswordException e) {
 			return "Incorrect password.";
 		} catch (IncorrectSecurityAnswerException e) {
@@ -165,25 +158,6 @@ public class UserManagement
 	public boolean isAdmin(String userName) throws NoSuchUserException,
 			DatabaseException {
 		return database.getRole(userName).equals(Role.ADMIN);
-	}
-
-	private void delete(List<String> params) throws NoSuchUserException,
-			DatabaseException, InsufficientRightsException,
-			IncorrectPasswordException {
-		String userName = params.get(0);
-		String password = params.get(1);
-
-		if (!security.verifyAdminRole(userName)) {
-			return;
-		}
-
-		if (!security.verifyPassword(userName, password)) {
-			return;
-		}
-
-		database.deleteUser(params.get(0));
-
-		success = true;
 	}
 
 	private void signIn(List<String> params) throws NoSuchUserException,
@@ -264,6 +238,15 @@ public class UserManagement
 		return true;
 	}
 
+	private String showSecurityQuestion(ArrayList<String> params)
+			throws NoSuchUserException, DatabaseException {
+		String userName = params.get(0);
+
+		String securityQ = database.getSecurityQuestion(userName);
+
+		return securityQ;
+	}
+
 	private void resetPasswordWithSecurityAnswer(List<String> params)
 			throws NoSuchUserException, DatabaseException,
 			InvalidPasswordException, IncorrectSecurityAnswerException {
@@ -272,20 +255,6 @@ public class UserManagement
 		String newPassword = params.get(2);
 
 		if (!security.verifySecurityAnswer(userName, securityAnswer)) {
-			return;
-		}
-
-		changePassword(userName, newPassword);
-	}
-
-	private void changePasswordWithOldPassword(List<String> params)
-			throws NoSuchUserException, DatabaseException,
-			InvalidPasswordException, IncorrectPasswordException {
-		String userName = params.get(0);
-		String oldPassword = params.get(1);
-		String newPassword = params.get(2);
-
-		if (!security.verifyPassword(userName, oldPassword)) {
 			return;
 		}
 
@@ -311,6 +280,42 @@ public class UserManagement
 		}
 	}
 
+	@SuppressWarnings("unused")
+	private void delete(List<String> params) throws NoSuchUserException,
+			DatabaseException, InsufficientRightsException,
+			IncorrectPasswordException {
+		String userName = params.get(0);
+		String password = params.get(1);
+
+		if (!security.verifyAdminRole(userName)) {
+			return;
+		}
+
+		if (!security.verifyPassword(userName, password)) {
+			return;
+		}
+
+		database.deleteUser(params.get(0));
+
+		success = true;
+	}
+
+	@SuppressWarnings("unused")
+	private void changePasswordWithOldPassword(List<String> params)
+			throws NoSuchUserException, DatabaseException,
+			InvalidPasswordException, IncorrectPasswordException {
+		String userName = params.get(0);
+		String oldPassword = params.get(1);
+		String newPassword = params.get(2);
+
+		if (!security.verifyPassword(userName, oldPassword)) {
+			return;
+		}
+
+		changePassword(userName, newPassword);
+	}
+
+	@SuppressWarnings("unused")
 	private void changeSecurityQuestionAndAnswer(List<String> args)
 			throws DatabaseException, NoSuchUserException,
 			IncorrectPasswordException {
@@ -327,6 +332,7 @@ public class UserManagement
 				newSecurityAnswer);
 	}
 
+	@SuppressWarnings("unused")
 	private void changeFullName(List<String> params) throws DatabaseException,
 			NoSuchUserException, IncorrectPasswordException {
 		String userName = params.get(0);
